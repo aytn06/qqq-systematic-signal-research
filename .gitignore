@@ -1,5 +1,14 @@
 __pycache__/
 *.pyc
+.pytest_cache/
+.mplconfig/
+.venv/
+venv/
+build/
+dist/
+htmlcov/
+*.egg-info/
+.coverage
 .ipynb_checkpoints/
 .env
 .DS_Store
@@ -10,3 +19,5 @@ figures/*.png
 results/*.csv
 !data/sample_prices.csv
 !data/README.md
+!figures/README.md
+!results/README.md

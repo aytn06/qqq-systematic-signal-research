@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qqq-systematic-signal-research"
+version = "0.1.0"
+description = "Research-grade QQQ signal backtesting pipeline with disciplined validation."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.26,<3",
+    "pandas>=2.2,<3",
+    "matplotlib>=3.8,<4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8,<9",
+]
+
+[project.urls]
+Repository = "https://github.com/aytn06/qqq-systematic-signal-research"
+
+[project.scripts]
+qqq-backtest = "src.run_backtest:main"
+qqq-plots = "src.make_plots:main"
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
