@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -9,13 +10,40 @@ from .config import BacktestConfig
 from .data_loader import load_price_data, add_returns
 from .signals import build_signal_matrix, equal_weight_ensemble
 from .backtest import backtest_many
+
+DEFAULT_INPUT = "data/sample_prices.csv"
+DEFAULT_OUTPUT_DIR = "figures"
+
+
+def ensure_matplotlib_cache_dir() -> None:
+    """
+    Use a repo-local Matplotlib config directory when the caller has not
+    explicitly provided one. This avoids cache writes into unwritable home
+    locations in sandboxed or CI environments.
+    """
+    if "MPLCONFIGDIR" not in os.environ:
+        cache_dir = Path(".mplconfig").resolve()
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        os.environ["MPLCONFIGDIR"] = str(cache_dir)
+    os.environ.setdefault("MPLBACKEND", "Agg")
+
+
+ensure_matplotlib_cache_dir()
+
 from .plots import plot_equity_curves, plot_drawdown, plot_signal_correlation
 
 
+def build_parser() -> argparse.ArgumentParser:
+    return argparse.ArgumentParser(
+        description="Generate standard diagnostic plots for the baseline QQQ research pipeline.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input", required=True, help="Path to CSV data.")
-    parser.add_argument("--output-dir", required=True, help="Directory for plots.")
+    parser = build_parser()
+    parser.add_argument("--input", default=DEFAULT_INPUT, help="Path to CSV data.")
+    parser.add_argument("--output-dir", default=DEFAULT_OUTPUT_DIR, help="Directory for plots.")
     args = parser.parse_args()
 
     config = BacktestConfig()

@@ -1,169 +1,173 @@
-# Systematic Signal Research Pipeline for QQQ
+# QQQ Systematic Signal Research
 
-## Objective
+Research project for building and evaluating interpretable QQQ timing signals with disciplined validation, transaction-cost modeling, and a clean handoff path for GitHub review.
 
-This project studies whether a diversified portfolio of QQQ timing signals can improve out-of-sample risk-adjusted performance relative to buy-and-hold QQQ.
+This repo is meant to feel like a real quant research project:
 
-The core research question is:
+- reproducible Python setup
+- documented data contract
+- CLI entry points for backtests and plots
+- lightweight test coverage
+- GitHub Actions CI for pushes and pull requests
 
-> Can a disciplined signal-research pipeline, using train/validation/blind-holdout separation, no-lookahead checks, transaction-cost modeling, and regime analysis, produce a robust QQQ allocation strategy?
+## What This Project Does
 
-This repository is designed as a research-grade implementation of a quant signal pipeline, not as a production trading system.
+The central question is:
 
-## Research Design
+> Can a diversified set of simple, interpretable QQQ timing signals improve out-of-sample risk-adjusted performance relative to buy-and-hold QQQ?
 
-The project uses a strict train / validation / blind-holdout protocol:
+The project focuses on process quality as much as raw Sharpe:
 
-| Split | Dates | Purpose |
-|---|---:|---|
-| Train | 2000-01-01 to 2015-12-31 | Develop signal hypotheses |
-| Validation | 2016-01-01 to 2021-12-31 | Select and combine signals |
-| Blind holdout | 2022-01-01 to 2025-06-30 | Final out-of-sample evaluation |
+- no-lookahead signal application
+- explicit train / validation / holdout periods
+- transaction-cost drag
+- parameter sensitivity checks
+- regime-aware analysis
 
-The final holdout period should not be used for signal development or model selection.
+This is a research backtest, not a production trading system.
 
-## Signal Families
+## Repository Layout
 
-The pipeline supports signals from several prespecified families:
+```text
+.
+├── data/                  # Input data contract and synthetic smoke-test dataset
+├── figures/               # Generated plots (gitignored, tracked via README)
+├── notebooks/             # Suggested exploratory notebook workflow
+├── reports/               # Short-form project summaries
+├── results/               # Generated tables and summaries (gitignored, tracked via README)
+├── src/                   # Core research package
+├── tests/                 # Unit and smoke tests
+├── CONTRIBUTING.md        # Workflow and contribution guidance
+├── Makefile               # Common developer commands
+├── pyproject.toml         # Project metadata and optional editable install
+└── README.md
+```
 
-- Trend-following
-- Mean reversion
-- Volatility / risk regime
-- Cross-asset macro signals
-- Defensive and short-bias overlays
-- Seasonality / flow effects
+## Quickstart
 
-The current starter implementation includes representative signals:
+Create a virtual environment and install the project in editable mode:
 
-| Signal | Family | Description |
-|---|---|---|
-| `long_term_trend` | Trend | Long when QQQ is above long moving average |
-| `medium_term_trend` | Trend | Tactical trend using medium moving average |
-| `rsi_deep_value` | Mean reversion / vol | Buys aggressively after oversold high-volatility selloffs |
-| `rsi_gated_short` | Defensive | Avoids shorting when QQQ is already deeply oversold |
-| `conservative_fade` | Defensive | Goes to cash in extreme volatility |
-| `vol_shock_dampener` | Risk control | Cuts leverage after large true-range shocks |
-| `dual_trend_macro` | Cross-asset | Combines QQQ trend with DXY trend |
-| `turn_of_month` | Seasonality | Higher exposure near month-turn windows |
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+```
 
-These signals are intentionally simple and interpretable. The value of the project comes from the validation framework, robustness checks, and portfolio combination discipline.
-
-## Role of LLM Assistance
-
-LLMs can be used for brainstorming candidate hypotheses and expanding the search space. However, all final signals should be reimplemented in a controlled Python framework, checked for look-ahead bias, evaluated with train/validation/holdout separation, and stress-tested through parameter sensitivity and regime analysis.
-
-The important research contribution is not "an LLM generated alpha." The important contribution is the disciplined process:
-
-1. Generate hypotheses.
-2. Reimplement them cleanly.
-3. Validate without look-ahead bias.
-4. Stress-test parameters.
-5. Combine signals using validation-period behavior.
-6. Evaluate once on the blind holdout.
-
-## Backtest Assumptions
-
-- Daily close-to-close returns.
-- Exposure is chosen using information available up to time `t`.
-- The position is applied to the next close-to-close return.
-- Exposure is clipped to the interval `[-1.0, 1.5]`.
-- No stop losses.
-- Transaction costs are modeled as a one-way cost on changes in exposure.
-- The default cost is 5 bps per unit turnover.
-
-The implementation uses `signal.shift(1)` before applying exposure to returns. This is conservative and helps avoid accidental look-ahead bias.
-
-## How to Run
-
-Install dependencies:
+If you prefer a plain requirements install:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run the main backtest using sample data:
+## Run The Pipeline
+
+The CLI defaults point at the included sample dataset, so the shortest path is:
 
 ```bash
-python -m src.run_backtest --input data/sample_prices.csv --output results/performance_summary.csv
+python -m src.run_backtest
+python -m src.make_plots
+pytest
 ```
 
-Generate plots:
+If you install the project in editable mode, these console scripts are also available:
 
 ```bash
-python -m src.make_plots --input data/sample_prices.csv --output-dir figures
+qqq-backtest
+qqq-plots
 ```
 
-Run basic tests:
+You can override the defaults when using your own dataset:
 
 ```bash
-pytest tests/
+python -m src.run_backtest \
+  --input data/sample_prices.csv \
+  --output results/performance_summary.csv
+
+python -m src.make_plots \
+  --input data/sample_prices.csv \
+  --output-dir figures
 ```
 
-## Expected Input Format
+## Research Design
 
-The pipeline expects a CSV with at least:
+The default validation windows are:
+
+| Split | Dates | Purpose |
+|---|---:|---|
+| Train | 2000-01-01 to 2015-12-31 | Develop hypotheses |
+| Validation | 2016-01-01 to 2021-12-31 | Select and combine signals |
+| Holdout | 2022-01-01 to 2025-06-30 | Final out-of-sample evaluation |
+
+The holdout period should not be used for iterative signal selection.
+
+## Included Signal Families
+
+The current baseline signal set includes:
+
+| Signal | Family | Description |
+|---|---|---|
+| `long_term_trend` | Trend | Long when QQQ is above a long moving average |
+| `medium_term_trend` | Trend | Medium-horizon tactical trend signal |
+| `rsi_deep_value` | Vol / mean reversion | Buys deeply oversold, high-volatility selloffs |
+| `rsi_gated_short` | Defensive | Avoids shorting into already oversold conditions |
+| `conservative_fade` | Defensive | Reduces risk during extreme volatility |
+| `vol_shock_dampener` | Risk control | Cuts exposure after unusually large true-range shocks |
+| `skew_filter` | Risk control | Avoids shorting when high-volatility returns skew positive |
+| `dual_trend_macro` | Cross-asset | Combines QQQ trend with DXY trend |
+| `turn_of_month` | Seasonality | Adds risk around month-turn behavior |
+
+The current ensemble is deliberately simple: equal-weight the signal zoo, then clip exposure to the allowed range.
+
+## Data Contract
+
+The pipeline expects at least these columns:
 
 ```text
-date, qqq_close, qqq_high, qqq_low, dxy_close
+date,qqq_close,qqq_high,qqq_low,dxy_close
 ```
 
-Optional columns can be added later:
+Optional future columns can include:
 
 ```text
-qqq_volume, vix_close, tlt_close, spy_close, rates_10y, etc.
+qqq_volume,spy_close,vix_close,tlt_close,rates_10y
 ```
 
-Raw proprietary or paid data should not be committed to this repository. Use `data/README.md` to document the source and format. Include only small sample files if needed.
+The included `data/sample_prices.csv` is synthetic smoke-test data spanning `2018-01-01` through `2025-06-30`. It is useful for validating the mechanics of the repo, not for making real research claims.
 
-## Results to Report
+Do not commit proprietary or licensed market data. Use [data/README.md](data/README.md) to document local datasets instead.
 
-For each strategy and split, report:
+## Developer Workflow
 
-- Annualized return
-- Annualized volatility
-- Sharpe ratio
-- Max drawdown
-- Calmar ratio
-- Turnover
-- Transaction-cost drag
-- Exposure distribution
-- Regime-sliced performance
+The repo includes a small but practical development loop:
 
-A final research table should compare:
+- `Makefile` for common setup and run commands
+- `pytest` smoke tests for data loading, metrics, and backtest mechanics
+- GitHub Actions CI in `.github/workflows/ci.yml`
 
-| Strategy | Validation Sharpe | Holdout Sharpe | Max DD | Turnover | Cost Assumption |
-|---|---:|---:|---:|---:|---:|
-| Buy and hold QQQ | TBD | TBD | TBD | 0 | 0 bps |
-| Simple trend | TBD | TBD | TBD | TBD | 5 bps |
-| Volatility strategy | TBD | TBD | TBD | TBD | 5 bps |
-| Ensemble | TBD | TBD | TBD | TBD | 5 bps |
+Recommended loop:
 
-## Robustness Checks
+1. Add or adjust one signal family at a time.
+2. Re-run the backtest summary.
+3. Re-generate figures.
+4. Run tests before pushing.
+5. Preserve holdout discipline.
 
-The repo includes hooks for:
+## Current Limitations
 
-- ±10% parameter sensitivity.
-- Transaction-cost sensitivity.
-- Regime-sliced evaluation.
-- Signal correlation analysis.
-- Drawdown-period attribution.
-- Train/validation/holdout comparison.
+- Daily close-to-close execution is idealized.
+- Transaction costs are simplified to one-way turnover costs.
+- Borrow, slippage, taxes, and capacity are not modeled.
+- The package name is intentionally lightweight and geared toward repo ergonomics, not distribution polish.
+- Sample data is synthetic and only validates mechanics.
 
-## Limitations
+## Good Next Steps
 
-This is a research backtest, not a production trading strategy.
+- Add richer signal families and more formal model selection rules.
+- Expand sensitivity-analysis coverage into tests or notebooks.
+- Add notebook examples for signal ideation and regime attribution.
+- Replace synthetic sample data with a documented local research dataset.
 
-Important limitations:
+## Resume-Friendly Summary
 
-- Results depend on data quality and adjustment methodology.
-- Daily close execution is idealized.
-- Transaction costs are simplified.
-- Slippage, borrow costs, spread effects, taxes, and capacity are not fully modeled.
-- Historical relationships may decay.
-- Signal selection must avoid repeated holdout peeking.
-
-## Resume Positioning
-
-A concise resume description:
-
-> Built a systematic QQQ signal-research and portfolio-construction pipeline with strict train/validation/blind-holdout separation, no-lookahead checks, transaction-cost modeling, regime-sliced validation, and parameter sensitivity tests.
+> Built a systematic QQQ signal-research pipeline with strict train/validation/holdout separation, no-lookahead backtesting, transaction-cost modeling, regime-aware evaluation, and GitHub-ready project scaffolding.
