@@ -6,4 +6,4 @@ cross_asset,NA,NA,NA,NA,yes,DXY or macro-style confirmation sleeve in original c
 volume_liquidity,NA,NA,NA,NA,no,weaker standalone contribution in original challenge workflow
 seasonality,NA,NA,NA,NA,yes,low-correlation supporting signal in original challenge workflow
 short_bias_defensive,NA,NA,NA,NA,yes,improved drawdown behavior in original challenge workflow
-final_ensemble,NA,NA,NA,NA,yes,reported in challenge materials as >1.3 Sharpe after costs on the original blind holdout
+final_ensemble,NA,>1.3,NA,NA,yes,combined selected signals; reported blind-holdout Sharpe after costs on the original private dataset

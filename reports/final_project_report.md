@@ -116,6 +116,8 @@ The results in this public report are generated from the sanitized sample datase
 
 The original challenge results were generated on a longer private dataset and are summarized separately in [reports/original_challenge_summary.md](original_challenge_summary.md). The public sample-data results are not intended to reproduce the original challenge Sharpe.
 
+The original private challenge run is documented as a summary result rather than a fully reproducible public artifact because the source dataset is not redistributed and the preserved public materials retained the headline after-cost Sharpe instead of the complete raw metric table.
+
 ## 10. Deliverables
 
 The public repo now includes:
