@@ -5,6 +5,19 @@ import pandas as pd
 from .features import sma, ema, rsi, parkinson_vol, atr, rolling_skew, month_turn_indicator
 
 
+SIGNAL_FAMILY_MAP = {
+    "long_term_trend": "trend",
+    "medium_term_trend": "trend",
+    "rsi_deep_value": "volatility_mean_reversion",
+    "rsi_gated_short": "defensive_volatility",
+    "conservative_fade": "defensive_volatility",
+    "vol_shock_dampener": "risk_control",
+    "skew_filter": "risk_control",
+    "dual_trend_macro": "cross_asset_macro",
+    "turn_of_month": "seasonality",
+}
+
+
 def clip_exposure(signal: pd.Series, min_exposure: float = -1.0, max_exposure: float = 1.5) -> pd.Series:
     return signal.clip(lower=min_exposure, upper=max_exposure)
 
@@ -160,6 +173,64 @@ def turn_of_month(df: pd.DataFrame, before: int = 1, after: int = 3) -> pd.Serie
     exp = pd.Series(0.5, index=df.index)
     exp[ind == 1] = 1.5
     return exp.rename("turn_of_month")
+
+
+SIGNAL_FUNCTIONS = {
+    "long_term_trend": long_term_trend,
+    "medium_term_trend": medium_term_trend,
+    "rsi_deep_value": rsi_deep_value,
+    "rsi_gated_short": rsi_gated_short,
+    "conservative_fade": conservative_fade,
+    "vol_shock_dampener": vol_shock_dampener,
+    "skew_filter": skew_filter,
+    "dual_trend_macro": dual_trend_macro,
+    "turn_of_month": turn_of_month,
+}
+
+
+SIGNAL_DEFAULT_PARAMS = {
+    "long_term_trend": {"window": 200},
+    "medium_term_trend": {"window": 50},
+    "rsi_deep_value": {
+        "vol_window": 21,
+        "rsi_window": 14,
+        "low_vol": 0.15,
+        "high_vol": 0.30,
+        "extreme_vol": 0.50,
+        "oversold": 20.0,
+    },
+    "rsi_gated_short": {
+        "vol_window": 21,
+        "rsi_window": 14,
+        "low_vol": 0.15,
+        "high_vol": 0.30,
+        "oversold": 30.0,
+    },
+    "conservative_fade": {
+        "vol_window": 21,
+        "low_vol": 0.15,
+        "high_vol": 0.30,
+        "extreme_vol": 0.50,
+    },
+    "vol_shock_dampener": {
+        "atr_window": 14,
+        "shock_multiple": 2.0,
+    },
+    "skew_filter": {
+        "vol_window": 21,
+        "skew_window": 21,
+        "high_vol": 0.30,
+        "positive_skew": 0.5,
+    },
+    "dual_trend_macro": {
+        "qqq_window": 200,
+        "dxy_window": 200,
+    },
+    "turn_of_month": {
+        "before": 1,
+        "after": 3,
+    },
+}
 
 
 def build_signal_matrix(df: pd.DataFrame) -> pd.DataFrame:
