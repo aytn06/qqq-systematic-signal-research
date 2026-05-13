@@ -46,11 +46,13 @@ The final research process evaluated signals across the following families:
 
 The main result was that the final ensemble achieved net blind-holdout Sharpe above 1.3 after transaction costs over 2022-01-01 to 2025-06-30.
 
+Exact full metric tables from the private challenge run are not redistributed here because the original dataset is not public and the preserved public materials retained the headline result rather than the complete raw output. This repository therefore documents the original result as a summary statistic, not as a fully reproducible public backtest artifact.
+
 | Strategy | Validation Sharpe | Blind-Holdout Sharpe | Max Drawdown | Notes |
 |---|---:|---:|---:|---|
 | Buy-and-hold QQQ | NA | NA | NA | Benchmark on the original private dataset |
 | Best single signal | NA | NA | NA | Strongest standalone signal on the original private dataset |
-| Final ensemble | NA | >1.3 | NA | Final selected portfolio; exact detailed metrics were not preserved in the public materials |
+| Final ensemble | NA | >1.3 | NA | Final selected portfolio; the preserved public materials retained the headline after-cost Sharpe rather than the full raw metric table |
 
 ## Robustness Checks
 
