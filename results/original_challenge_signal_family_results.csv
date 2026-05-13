@@ -1,0 +1,9 @@
+signal_family,validation_sharpe,blind_holdout_sharpe,max_drawdown,turnover,kept_in_final_ensemble,notes
+trend,NA,NA,NA,NA,yes,core directional regime signal in original challenge workflow
+mean_reversion,NA,NA,NA,NA,yes,helped during oversold rebounds in original challenge workflow
+volatility_regime,NA,NA,NA,NA,yes,defensive overlay in original challenge workflow
+cross_asset,NA,NA,NA,NA,yes,DXY or macro-style confirmation sleeve in original challenge workflow
+volume_liquidity,NA,NA,NA,NA,no,weaker standalone contribution in original challenge workflow
+seasonality,NA,NA,NA,NA,yes,low-correlation supporting signal in original challenge workflow
+short_bias_defensive,NA,NA,NA,NA,yes,improved drawdown behavior in original challenge workflow
+final_ensemble,NA,NA,NA,NA,yes,reported in challenge materials as >1.3 Sharpe after costs on the original blind holdout
