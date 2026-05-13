@@ -110,7 +110,13 @@ Structural regime summaries in [results/regime_summary.csv](../results/regime_su
 - Costs, slippage, taxes, and borrow are still simplified.
 - A stronger public version would use a longer redistributable dataset and more diverse non-duplicate sleeves.
 
-## 9. Deliverables
+## 9. Relationship to Original Challenge
+
+The results in this public report are generated from the sanitized sample dataset. They are included to demonstrate the reproducibility and mechanics of the codebase.
+
+The original challenge results were generated on a longer private dataset and are summarized separately in [reports/original_challenge_summary.md](original_challenge_summary.md). The public sample-data results are not intended to reproduce the original challenge Sharpe.
+
+## 10. Deliverables
 
 The public repo now includes:
 
@@ -125,3 +131,4 @@ The public repo now includes:
 - [figures/parameter_sensitivity_heatmap.png](../figures/parameter_sensitivity_heatmap.png)
 - [figures/regime_breakdown.png](../figures/regime_breakdown.png)
 - [notebooks/01_project_report.ipynb](../notebooks/01_project_report.ipynb)
+- [reports/original_challenge_summary.md](original_challenge_summary.md)

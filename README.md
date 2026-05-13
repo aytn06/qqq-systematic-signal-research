@@ -27,6 +27,25 @@ The project focuses on process quality as much as raw Sharpe:
 
 This is a research backtest, not a production trading system.
 
+## Public Artifact vs. Original Challenge Results
+
+This repository contains a public, sanitized version of the QQQ signal-research framework. The included sample dataset is used to demonstrate the mechanics of the pipeline and to make the code runnable without redistributing private challenge data.
+
+The original Quanta QR Fellowship finalist project used a longer QQQ dataset with the following protocol:
+
+| Split | Dates | Purpose |
+|---|---:|---|
+| Train | 2000-01-01 to 2015-12-31 | Signal development |
+| Validation | 2016-01-01 to 2021-12-31 | Signal selection and ensemble construction |
+| Blind holdout | 2022-01-01 to 2025-06-30 | Final out-of-sample evaluation |
+
+The public sample-data results should not be interpreted as the original challenge performance. Original challenge result summaries are documented in:
+
+- [reports/original_challenge_summary.md](reports/original_challenge_summary.md)
+- [results/original_challenge_performance_summary.csv](results/original_challenge_performance_summary.csv)
+- [results/original_challenge_signal_family_results.csv](results/original_challenge_signal_family_results.csv)
+- [results/original_challenge_cost_sensitivity.csv](results/original_challenge_cost_sensitivity.csv)
+
 ## Repository Layout
 
 ```text
