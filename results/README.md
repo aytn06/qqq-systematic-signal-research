@@ -2,12 +2,13 @@
 
 This directory is for generated research outputs such as:
 
-- performance summary tables
-- model comparison exports
-- sensitivity-analysis exports
+- final performance summary tables
+- model-selection exports
+- cost and parameter sensitivity exports
+- regime breakdown exports
 
-CSV outputs are gitignored by default. Regenerate the baseline summary with:
+The named final CSV artifacts are committed for review, while other scratch outputs remain gitignored. Regenerate the public artifact pack with:
 
 ```bash
-python -m src.run_backtest
+python -m src.generate_research_artifacts
 ```

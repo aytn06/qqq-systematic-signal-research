@@ -1,0 +1,7 @@
+family,signal,display_name,selected_for_final_ensemble,selection_order,validation_sharpe,holdout_sharpe,validation_avg_turnover,max_abs_validation_corr_to_selected
+trend,medium_term_trend,Medium-Term Trend,True,1,0.6451446758390286,0.02214021221291814,0.09213051823416507,0.0
+volatility_mean_reversion,rsi_deep_value,RSI Deep Value,True,2,0.2639295224837719,-0.45161044104290937,0.0,0.0
+seasonality,turn_of_month,Turn of Month,True,3,0.05313488801043821,-0.15784756716981216,0.09213051823416507,0.01602764946177278
+defensive_volatility,rsi_gated_short,RSI Gated Short,False,,0.2639295224837719,-0.45161044104290937,0.0,0.0
+risk_control,skew_filter,Skew Filter,False,,0.2639295224837719,-0.45161044104290937,0.0,0.0
+cross_asset_macro,dual_trend_macro,Dual Trend Macro,False,,-0.34165024116227927,-0.9088394400894839,0.08493282149712092,0.3994179658888275

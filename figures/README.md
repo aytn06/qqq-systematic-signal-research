@@ -2,12 +2,14 @@
 
 This directory is for generated visual artifacts such as:
 
-- equity curves
+- final equity curves
 - drawdown charts
+- rolling Sharpe diagnostics
 - signal correlation plots
+- regime and sensitivity diagnostics
 
-PNG outputs are gitignored by default. Regenerate them locally with:
+The named final artifacts are committed for review, while other ad hoc PNG outputs remain gitignored. Regenerate the public artifact pack with:
 
 ```bash
-python -m src.make_plots
+python -m src.generate_research_artifacts
 ```

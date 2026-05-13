@@ -47,10 +47,18 @@ def calmar_ratio(returns: pd.Series, trading_days: int = 252) -> float:
     return ann / abs(mdd)
 
 
+def total_return(returns: pd.Series) -> float:
+    returns = returns.dropna()
+    if len(returns) == 0:
+        return np.nan
+    return (1 + returns).prod() - 1
+
+
 def summarize_backtest(bt: pd.DataFrame, config: BacktestConfig, return_col: str = "net_return") -> dict[str, float]:
     r = bt[return_col].dropna()
     if len(r) == 0:
         return {
+            "total_return": np.nan,
             "ann_return": np.nan,
             "ann_vol": np.nan,
             "sharpe": np.nan,
@@ -62,6 +70,7 @@ def summarize_backtest(bt: pd.DataFrame, config: BacktestConfig, return_col: str
         }
 
     return {
+        "total_return": total_return(r),
         "ann_return": annualized_return(r, config.trading_days),
         "ann_vol": annualized_volatility(r, config.trading_days),
         "sharpe": sharpe_ratio(r, config.trading_days),
@@ -96,3 +105,10 @@ def summarize_by_split(
 
 def equity_curve(returns: pd.Series) -> pd.Series:
     return (1 + returns.fillna(0)).cumprod()
+
+
+def rolling_sharpe(returns: pd.Series, window: int = 126, trading_days: int = 252) -> pd.Series:
+    mean = returns.rolling(window=window, min_periods=window).mean() * trading_days
+    vol = returns.rolling(window=window, min_periods=window).std() * np.sqrt(trading_days)
+    sharpe = mean / vol.replace(0, np.nan)
+    return sharpe
