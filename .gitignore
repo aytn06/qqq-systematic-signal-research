@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.env
+.DS_Store
+data/raw/
+data/*.parquet
+data/*.pkl
+figures/*.png
+results/*.csv
+!data/sample_prices.csv
+!data/README.md
