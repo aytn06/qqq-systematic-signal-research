@@ -117,6 +117,21 @@ def signal_split_metrics(summary: pd.DataFrame, split: str) -> pd.DataFrame:
     ).drop(columns=["split"])
 
 
+def validation_selection_score(candidates: pd.DataFrame) -> pd.Series:
+    """
+    Build a validation-only ranking score for family representatives.
+
+    Higher validation Sharpe is better. Less-negative drawdown is rewarded,
+    while turnover and annualized cost drag are lightly penalized.
+    """
+    return (
+        candidates["validation_sharpe"].fillna(-10.0)
+        + 0.50 * candidates["validation_max_drawdown"].fillna(-1.0)
+        - 0.25 * candidates["validation_avg_turnover"].fillna(0.0)
+        - 0.10 * candidates["validation_cost_drag_ann"].fillna(0.0)
+    )
+
+
 def select_validation_signals(
     signals: pd.DataFrame,
     signal_backtests: dict[str, pd.DataFrame],
@@ -134,14 +149,20 @@ def select_validation_signals(
         .merge(holdout, on="signal", how="left")
         .merge(full, on="signal", how="left")
     )
+    candidates["validation_selection_score"] = validation_selection_score(candidates)
 
     validation_slice = signals.loc[config.valid_start : config.valid_end]
     corr = validation_slice.corr().abs().fillna(0.0)
 
     family_best = (
         candidates.sort_values(
-            ["validation_sharpe", "holdout_sharpe", "validation_avg_turnover"],
-            ascending=[False, False, True],
+            [
+                "validation_selection_score",
+                "validation_sharpe",
+                "validation_max_drawdown",
+                "validation_avg_turnover",
+            ],
+            ascending=[False, False, False, True],
         )
         .groupby("family", as_index=False)
         .head(1)
@@ -152,8 +173,13 @@ def select_validation_signals(
     selection_rows = []
     max_selected = 4
     for _, row in family_best.sort_values(
-        ["validation_sharpe", "holdout_sharpe"],
-        ascending=[False, False],
+        [
+            "validation_selection_score",
+            "validation_sharpe",
+            "validation_max_drawdown",
+            "validation_avg_turnover",
+        ],
+        ascending=[False, False, False, True],
     ).iterrows():
         signal = row["signal"]
         max_corr = max((corr.loc[signal, chosen] for chosen in selected), default=0.0)
@@ -189,7 +215,19 @@ def select_validation_signals(
     selection = family_best.merge(pd.DataFrame(selection_rows), on=["signal", "family"], how="left")
 
     if len(selected) < 3:
-        remaining = [signal for signal in candidates.sort_values("validation_sharpe", ascending=False)["signal"] if signal not in selected]
+        remaining = [
+            signal
+            for signal in candidates.sort_values(
+                [
+                    "validation_selection_score",
+                    "validation_sharpe",
+                    "validation_max_drawdown",
+                    "validation_avg_turnover",
+                ],
+                ascending=[False, False, False, True],
+            )["signal"]
+            if signal not in selected
+        ]
         for signal in remaining:
             min_abs_diff = min(
                 (
@@ -209,7 +247,10 @@ def select_validation_signals(
         ]
 
     selection["display_name"] = selection["signal"].map(DISPLAY_NAMES)
-    return selected, selection.sort_values(["selected_for_final_ensemble", "validation_sharpe"], ascending=[False, False]).reset_index(drop=True)
+    return selected, selection.sort_values(
+        ["selected_for_final_ensemble", "validation_selection_score", "validation_sharpe"],
+        ascending=[False, False, False],
+    ).reset_index(drop=True)
 
 
 def structural_and_event_regimes(df: pd.DataFrame) -> pd.DataFrame:
@@ -276,7 +317,20 @@ def main() -> None:
     summary["display_name"] = summary["strategy"].map(DISPLAY_NAMES).fillna(summary["strategy"])
 
     selection.to_csv(results_dir / "signal_family_results.csv", index=False)
-    selection.loc[:, ["family", "signal", "display_name", "selected_for_final_ensemble", "selection_order", "validation_sharpe", "holdout_sharpe", "validation_avg_turnover", "max_abs_validation_corr_to_selected"]].to_csv(
+    selection.loc[:, [
+        "family",
+        "signal",
+        "display_name",
+        "selected_for_final_ensemble",
+        "selection_order",
+        "validation_selection_score",
+        "validation_sharpe",
+        "validation_max_drawdown",
+        "validation_avg_turnover",
+        "validation_cost_drag_ann",
+        "holdout_sharpe",
+        "max_abs_validation_corr_to_selected",
+    ]].to_csv(
         results_dir / "model_selection_summary.csv",
         index=False,
     )

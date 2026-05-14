@@ -170,10 +170,10 @@ Signals are developed at the individual-sleeve level first and evaluated on the 
 The public artifact pack uses the following selection rules:
 
 1. Group candidate signals by family.
-2. Within each family, rank signals by validation Sharpe after costs.
+2. Within each family, rank signals with a validation-only score that rewards higher Sharpe and shallower drawdowns while lightly penalizing turnover and cost drag.
 3. Remove near-duplicate validation profiles so the final basket is not just the same sleeve repeated under different names.
 4. Build the final ensemble from the surviving family representatives and clip exposure to the allowed range.
-5. Do not use the holdout period to iteratively tune membership.
+5. Report holdout metrics only after the ensemble membership is already fixed.
 
 On the current public sample, this produces a final ensemble composed of:
 
