@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .config import BacktestConfig
+from .config import infer_backtest_config
 from .data_loader import load_price_data, add_returns
 from .signals import build_signal_matrix, equal_weight_ensemble
 from .backtest import backtest_many
@@ -29,8 +29,8 @@ def main() -> None:
     parser.add_argument("--output", default=DEFAULT_OUTPUT, help="Path to output performance summary CSV.")
     args = parser.parse_args()
 
-    config = BacktestConfig()
     df = add_returns(load_price_data(args.input))
+    config = infer_backtest_config(df.index)
 
     signals = build_signal_matrix(df)
     ensemble = equal_weight_ensemble(signals, config.min_exposure, config.max_exposure)

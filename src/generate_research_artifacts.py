@@ -8,7 +8,7 @@ from pathlib import Path
 import pandas as pd
 
 from .backtest import backtest_many
-from .config import BacktestConfig
+from .config import BacktestConfig, infer_backtest_config
 from .data_loader import add_returns, load_price_data
 from .metrics import summarize_by_split
 from .plots import (
@@ -64,38 +64,6 @@ def build_parser() -> argparse.ArgumentParser:
     return argparse.ArgumentParser(
         description="Generate public-facing research artifacts and figures for the QQQ signal project.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-
-
-def public_artifact_config(df: pd.DataFrame) -> BacktestConfig:
-    start = df.index.min()
-    end = df.index.max()
-    canonical = (
-        start <= pd.Timestamp("2018-01-02")
-        and end >= pd.Timestamp("2025-06-30")
-    )
-    if canonical:
-        return BacktestConfig(
-            train_start="2018-01-01",
-            train_end="2020-12-31",
-            valid_start="2021-01-01",
-            valid_end="2022-12-31",
-            holdout_start="2023-01-01",
-            holdout_end="2025-06-30",
-            transaction_cost=0.0005,
-        )
-
-    dates = pd.Index(df.index.unique()).sort_values()
-    train_end = dates[int(len(dates) * 0.45)]
-    valid_end = dates[int(len(dates) * 0.70)]
-    return BacktestConfig(
-        train_start=str(dates[0].date()),
-        train_end=str(train_end.date()),
-        valid_start=str((train_end + pd.Timedelta(days=1)).date()),
-        valid_end=str(valid_end.date()),
-        holdout_start=str((valid_end + pd.Timedelta(days=1)).date()),
-        holdout_end=str(dates[-1].date()),
-        transaction_cost=0.0005,
     )
 
 
@@ -297,7 +265,7 @@ def main() -> None:
     figures_dir.mkdir(parents=True, exist_ok=True)
 
     df = add_returns(load_price_data(args.input))
-    config = public_artifact_config(df)
+    config = infer_backtest_config(df.index)
 
     signals = build_signal_matrix(df)
     signal_backtests = backtest_many(df["qqq_return"], signals, config=config, shift_exposure=True)
