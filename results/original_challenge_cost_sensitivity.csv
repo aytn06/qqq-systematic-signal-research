@@ -1,6 +1,6 @@
 strategy,cost_bps,blind_holdout_sharpe,max_drawdown,ann_return,notes
 final_ensemble,0,NA,NA,NA,no transaction costs on original private blind holdout
 final_ensemble,1,NA,NA,NA,low cost on original private blind holdout
-final_ensemble,5,>1.3,NA,NA,base assumption used in the challenge summary; reported blind-holdout Sharpe after costs
+final_ensemble,5,>1.3,NA,NA,base assumption; reported original blind-holdout result after costs
 final_ensemble,10,NA,NA,NA,higher cost stress on original private blind holdout
 final_ensemble,20,NA,NA,NA,stress cost on original private blind holdout

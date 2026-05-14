@@ -28,7 +28,7 @@ The blind holdout period was not used for signal development.
 - Position held until the next close.
 - Transaction costs included in final reported results.
 - Final signals were evaluated using train / validation / blind-holdout separation.
-- Robustness checks included ±10% parameter sensitivity and regime-sliced analysis.
+- Robustness checks included +/- 10% parameter sensitivity and regime-sliced analysis.
 
 ## Signal Families
 
@@ -44,7 +44,7 @@ The final research process evaluated signals across the following families:
 
 ## Final Original-Challenge Results
 
-The main result was that the final ensemble achieved net blind-holdout Sharpe above 1.3 after transaction costs over 2022-01-01 to 2025-06-30.
+The preserved challenge materials report that the final ensemble achieved net blind-holdout Sharpe above 1.3 after transaction costs over 2022-01-01 to 2025-06-30.
 
 Exact full metric tables from the private challenge run are not redistributed here because the original dataset is not public and the preserved public materials retained the headline result rather than the complete raw output. This repository therefore documents the original result as a summary statistic, not as a fully reproducible public backtest artifact.
 
