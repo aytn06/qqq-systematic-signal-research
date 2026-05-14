@@ -44,7 +44,7 @@ Each signal emits daily target exposure in the bounded range `[-1.0, 1.5]`. Expo
 
 The final public-sample ensemble is selected by:
 
-1. Ranking each family by validation Sharpe after 5 bps costs.
+1. Ranking each family by a validation-only score that combines validation Sharpe, validation max drawdown, turnover, and cost drag.
 2. Removing near-duplicate validation profiles.
 3. Combining the surviving family representatives in an equal-weight clipped ensemble.
 
