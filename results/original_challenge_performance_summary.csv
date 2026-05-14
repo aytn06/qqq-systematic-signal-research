@@ -4,4 +4,4 @@ buy_and_hold,blind_holdout,NA,NA,NA,NA,NA,0,0,benchmark on original private blin
 best_single_signal,validation,NA,NA,NA,NA,NA,NA,5,best standalone validation signal on original private dataset
 best_single_signal,blind_holdout,NA,NA,NA,NA,NA,NA,5,blind holdout result on original private dataset
 final_ensemble,validation,NA,NA,NA,NA,NA,NA,5,selected on original private validation split
-final_ensemble,blind_holdout,NA,NA,>1.3,NA,NA,NA,5,reported original blind-holdout result after costs on the private challenge dataset
+final_ensemble,blind_holdout,NA,NA,>1.3,NA,NA,NA,5,reported original blind-holdout result after costs

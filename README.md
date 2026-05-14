@@ -11,6 +11,12 @@ This repo is meant to feel like a real quant research project:
 - lightweight test coverage
 - GitHub Actions CI for pushes and pull requests
 
+## Reviewer Takeaway
+
+This repository is intended to demonstrate the research process behind the project: clean signal implementation, no-lookahead backtesting, train/validation/holdout separation, transaction-cost modeling, sensitivity analysis, and regime evaluation.
+
+The public sample-data results are not intended to reproduce the original private challenge Sharpe. The original challenge result is documented separately as a preserved summary statistic.
+
 ## What This Project Does
 
 The central question is:
