@@ -23,3 +23,9 @@ jobs:
 
       - name: Run tests
         run: pytest -q
+
+      - name: Run baseline backtest
+        run: python -m src.run_backtest
+
+      - name: Regenerate public artifacts
+        run: python -m src.generate_research_artifacts
