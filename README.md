@@ -1,15 +1,14 @@
 # QQQ Systematic Signal Research
 
-Research project for building and evaluating interpretable QQQ timing signals with disciplined validation, transaction-cost modeling, and a clean handoff path for GitHub review.
+Systematic QQQ signal research repository built around a Quanta QR Fellowship finalist project. The repo includes the signal-construction pipeline, the validation protocol, committed public artifacts, and a sanitized reproducible sample so the code can be run end to end without redistributing private challenge data.
 
-This repo is meant to feel like a real quant research project:
+The current public repo demonstrates:
 
-- reproducible Python setup
-- documented data contract
-- CLI entry points for backtests and plots
-- committed public research artifacts
-- lightweight test coverage
-- GitHub Actions CI for pushes and pull requests
+- interpretable signal construction across several families
+- no-lookahead backtesting with explicit train / validation / holdout splits
+- transaction-cost modeling, sensitivity analysis, and regime diagnostics
+- committed figures, result tables, and a notebook/report pair for review
+- lightweight test coverage and CI for the runnable research workflow
 
 ## Reviewer Takeaway
 
@@ -49,6 +48,7 @@ The public sample-data results should not be interpreted as the original challen
 
 - [reports/original_challenge_summary.md](reports/original_challenge_summary.md)
 - [reports/original_challenge_evidence/README.md](reports/original_challenge_evidence/README.md)
+- [reports/research_decisions.md](reports/research_decisions.md)
 - [results/original_challenge_performance_summary.csv](results/original_challenge_performance_summary.csv)
 - [results/original_challenge_signal_family_results.csv](results/original_challenge_signal_family_results.csv)
 - [results/original_challenge_cost_sensitivity.csv](results/original_challenge_cost_sensitivity.csv)
@@ -184,6 +184,15 @@ On the current public sample, this produces a final ensemble composed of:
 
 The selection summary is committed in [results/model_selection_summary.csv](results/model_selection_summary.csv) and the per-family comparison lives in [results/signal_family_results.csv](results/signal_family_results.csv).
 
+## What Changed During Research
+
+The repo now includes a short decision log in [reports/research_decisions.md](reports/research_decisions.md). The most important project-level changes were:
+
+- defensive sleeves such as `conservative_fade`, `rsi_gated_short`, and `skew_filter` were left out of the final public ensemble because their validation profiles largely duplicated `rsi_deep_value`
+- `dual_trend_macro` remained in the comparison set for cross-asset context, but it did not survive validation-only family ranking on the committed public sample
+- family selection was tightened to use a validation-only score after removing holdout leakage from the artifact-generation path
+- the negative public-sample holdout result was kept in the repo rather than swapped out for a more flattering but less honest artifact pack
+
 ## Headline Results
 
 The committed results below come from the reproducible public sample split and the default 5 bps one-way turnover cost assumption.
@@ -239,6 +248,7 @@ The repo now includes a committed public-facing artifact pack so reviewers do no
 
 - [notebooks/01_project_report.ipynb](notebooks/01_project_report.ipynb): polished walk-through notebook
 - [reports/final_project_report.md](reports/final_project_report.md): concise research memo
+- [reports/research_decisions.md](reports/research_decisions.md): concrete iteration notes and signal-selection rationale
 - [results/public_data_split.csv](results/public_data_split.csv): exact split boundaries used for the public sample
 - final summary, cost, parameter, and regime CSV outputs in `results/`
 - final plots in `figures/`
