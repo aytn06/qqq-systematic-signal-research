@@ -48,6 +48,7 @@ The original Quanta QR Fellowship finalist project used a longer QQQ dataset wit
 The public sample-data results should not be interpreted as the original challenge performance. Original challenge result summaries are documented in:
 
 - [reports/original_challenge_summary.md](reports/original_challenge_summary.md)
+- [reports/original_challenge_evidence/README.md](reports/original_challenge_evidence/README.md)
 - [results/original_challenge_performance_summary.csv](results/original_challenge_performance_summary.csv)
 - [results/original_challenge_signal_family_results.csv](results/original_challenge_signal_family_results.csv)
 - [results/original_challenge_cost_sensitivity.csv](results/original_challenge_cost_sensitivity.csv)
