@@ -1,52 +1,73 @@
-# Research Decisions
+# Project Notes
 
-This note captures the concrete decisions that shaped the committed public version of the project. The goal is to preserve some of the day-to-day research tradeoffs rather than only the cleaned final artifact pack.
+I kept this note to record the decisions that shaped the public version of the
+QQQ project. The goal is not to present a polished story after the fact. It is
+to keep track of what changed once the backtests, validation results, and
+report-generation path were inspected more carefully.
 
-## 1. Public Sample Framing
+## Public Sample And Private Challenge Run
 
-The original challenge used a longer private dataset, while the public repo ships with a sanitized `2018-01-02` through `2025-06-30` sample. That forced a split between:
+The original challenge used a longer private dataset. This repo ships with a
+sanitized sample covering `2018-01-02` through `2025-06-30` so the code can run
+publicly. That split forced the project into two layers:
 
-- a reproducible public artifact pack that anyone can run locally
-- a separately documented original challenge summary that is not reproduced from raw private data
+- a runnable public pipeline generated from the committed sample
+- a separate summary of the original finalist result on the private dataset
 
-This is why the repo keeps both:
+That is why the repo keeps both the public result tables in `results/` and the
+private-run summary in `reports/original_challenge_summary.md`.
 
-- `results/final_performance_summary.csv` for the public sample
-- `reports/original_challenge_summary.md` for the private-run summary
+## Shifted Exposure Became The Default
 
-## 2. Shifted Exposure Became the Default
+The backtest applies today's chosen exposure to the next day's return. That
+choice is slightly harsher on performance, but it makes the pipeline much easier
+to defend because the exposure path does not reuse same-day information.
 
-The backtest path applies exposure to the next return rather than the same-day return. That choice is conservative and slightly worsens some headline metrics, but it reduces accidental lookahead bias and makes the repo easier to defend under review.
+## Family Diversity Mattered More Than Raw Signal Count
 
-## 3. Family Diversity Mattered More Than Signal Count
-
-Several sleeves looked different by name but behaved almost identically on validation. In particular:
+Several sleeves had different names but very similar validation behavior. On the
+public sample, the main example was the cluster around:
 
 - `conservative_fade`
 - `rsi_gated_short`
 - `skew_filter`
 
-all tracked closely with `rsi_deep_value` on the public sample. The final public ensemble therefore keeps the strongest representative instead of including multiple near-duplicates.
+Those sleeves moved too much like `rsi_deep_value` to justify all of them
+surviving into the final ensemble. The public version therefore keeps one strong
+representative instead of pretending multiple near-duplicates are independent
+ideas.
 
-## 4. Cross-Asset Macro Stayed in the Comparison Set
+## Cross-Asset Confirmation Stayed In The Comparison Set
 
-`dual_trend_macro` stayed in the committed outputs because it is useful to show that the project tested cross-asset confirmation ideas rather than only price-derived sleeves. It was not selected into the final public ensemble because its validation-only ranking lagged the surviving family representatives.
+`dual_trend_macro` stayed in the committed outputs because it captures a real
+part of the research question: whether QQQ timing improves when price trend is
+checked against a broad dollar signal. It was not selected into the final public
+ensemble because its validation ranking lagged the sleeves that survived.
 
-## 5. Holdout Leakage Was Removed
+## Holdout Leakage Was Removed
 
-An earlier artifact-generation pass used holdout information in the selection path. The committed version fixes that. The final public ensemble is now chosen with a validation-only score based on:
+An earlier report-generation pass let holdout information influence the public
+selection path. The committed version fixes that. The final public ensemble is
+now ranked only on:
 
 - validation Sharpe
 - validation max drawdown
 - validation turnover
 - validation cost drag
 
-Holdout metrics are still reported, but they are no longer used to rank or select sleeves.
+Holdout metrics are still reported, but they are no longer used to choose which
+signals survive.
 
-## 6. The Public Holdout Result Was Left Intact
+## The Negative Public Holdout Was Left In Place
 
-The public-sample final ensemble has a negative holdout Sharpe. That is not flattering, but it is informative. The repo keeps that result because the point of the public project is to demonstrate disciplined research mechanics, not to backfill a prettier story after the fact.
+The public-sample final ensemble does not have a positive holdout Sharpe. I left
+that result in the repo because the project is supposed to show the research
+process honestly, not quietly swap in a prettier sample after the fact.
 
-## 7. Evidence for the Original Challenge Is Still Incomplete
+## Evidence For The Original Challenge Result Is Still Limited
 
-The repo now has a dedicated folder at `reports/original_challenge_evidence/` for recovered screenshots, notebooks, PDFs, or other supporting artifacts. No private-run evidence file is committed yet, so the original Quanta result remains documented as a preserved summary statistic rather than a fully reproduced public result.
+The repo has a dedicated folder at `reports/original_challenge_evidence/` for
+recovered screenshots, PDFs, notebooks, or old output tables. Right now, the
+original Quanta result is still documented mostly as a preserved summary rather
+than a fully reproduced evidence trail. That is an evidence gap, and the repo
+states it directly instead of smoothing it over.

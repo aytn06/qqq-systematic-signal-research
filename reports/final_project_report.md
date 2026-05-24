@@ -1,136 +1,105 @@
-# QQQ Systematic Signal Research
+# QQQ Signal Research Report
 
-## 1. Research Question
+I built this project to study a narrow but practical question: can a small set
+of interpretable QQQ timing rules improve the risk profile of holding Nasdaq
+exposure, or do they disappear once the backtest is run with proper timing,
+costs, and a real validation split?
 
-Can a diversified portfolio of simple QQQ timing signals improve out-of-sample risk-adjusted returns relative to buy-and-hold while preserving no-lookahead discipline and explicit transaction-cost modeling?
+The public repository contains the runnable version of that workflow. It does
+not ship the original private challenge dataset, so the committed output files
+are generated from a sanitized public sample covering `2018-01-02` through
+`2025-06-30`. That public sample is long enough to show how the pipeline works,
+how the signal sleeves interact, and how the validation logic behaves, even
+though it is not a full reproduction of the private-run finalist result.
 
-## 2. Data
+The core design of the project is simple. Each sleeve maps daily market
+information into a target QQQ exposure between `-1.0` and `1.5`. The data is
+minimal by design: QQQ close/high/low plus DXY. From that input, the code
+builds trend, volatility, oversold, macro, and seasonality signals rather than
+fitting a large black-box feature model.
 
-The public repository ships with a sanitized sample dataset covering `2018-01-02` through `2025-06-30` with the following minimum schema:
+The signal set includes:
 
-```text
-date,qqq_close,qqq_high,qqq_low,dxy_close
-```
+- long-term trend
+- medium-term trend
+- volatility / oversold mean reversion
+- defensive volatility overlays
+- shock and skew risk controls
+- cross-asset confirmation through DXY
+- month-turn seasonality
 
-Because the original full-history private research inputs are not committed, the public artifact pack uses the following reproducible split:
+Every sleeve produces a daily target exposure. That exposure is applied to the
+next day's QQQ return, not the same day's return. This shifted-exposure rule is
+one of the most important integrity choices in the repo because it keeps the
+signal path from accidentally using same-day information twice. Turnover is
+tracked directly, and one-way transaction costs are charged against exposure
+changes.
 
-| Split | Start | End |
-|---|---|---|
-| Train | 2018-01-01 | 2020-12-31 |
-| Validation | 2021-01-01 | 2022-12-31 |
-| Holdout | 2023-01-01 | 2025-06-30 |
+The original project was designed around a long train / validation /
+blind-holdout split:
 
-## 3. Method
+| Split | Dates | Purpose |
+|---|---:|---|
+| Train | 2000-01-01 to 2015-12-31 | Develop and discard hypotheses |
+| Validation | 2016-01-01 to 2021-12-31 | Choose sleeves and form the ensemble |
+| Blind holdout | 2022-01-01 to 2025-06-30 | Final out-of-sample evaluation |
 
-The repo implements several interpretable signal families:
+Because the committed public sample is shorter, the public repo uses:
 
-- trend
-- volatility / mean reversion
-- defensive volatility
-- risk control
-- cross-asset macro
-- seasonality
+| Public split | Dates | Purpose |
+|---|---:|---|
+| Train | 2018-01-01 to 2020-12-31 | First-pass signal work |
+| Validation | 2021-01-01 to 2022-12-31 | Sleeve selection on the public sample |
+| Holdout | 2023-01-01 to 2025-06-30 | Final public-sample evaluation |
 
-Each signal emits daily target exposure in the bounded range `[-1.0, 1.5]`. Exposure is applied to the next day’s close-to-close return, and one-way transaction costs are modeled as a function of turnover.
-
-## 4. Backtest Integrity
-
-- Signal application uses shifted exposures to reduce lookahead risk.
-- Validation-period behavior is used for signal selection.
-- The holdout period is not used for iterative membership changes in the final ensemble.
-- The final public artifact pack is regenerated directly from code via `python -m src.generate_research_artifacts`.
-
-## 5. Model Selection
-
-The final public-sample ensemble is selected by:
-
-1. Ranking each family by a validation-only score that combines validation Sharpe, validation max drawdown, turnover, and cost drag.
-2. Removing near-duplicate validation profiles.
-3. Combining the surviving family representatives in an equal-weight clipped ensemble.
-
-On the committed public sample, the final ensemble contains:
+The selection step is validation-only. Signals are first grouped by family and
+ranked using validation Sharpe, validation drawdown, turnover, and cost drag.
+Near-duplicate validation profiles are then removed so the final ensemble does
+not quietly become several versions of the same exposure path. On the committed
+public sample, the final ensemble consists of:
 
 - `medium_term_trend`
 - `rsi_deep_value`
 - `turn_of_month`
 
-The detailed family ranking is committed in [results/model_selection_summary.csv](../results/model_selection_summary.csv).
+That selection logic matters because it is where many timing projects cheat.
+This repo keeps the holdout period for reporting, not for iterative membership
+changes.
 
-## 6. Results
+The public-sample results are intentionally mixed. The final public ensemble
+improves holdout drawdown relative to buy-and-hold, but its holdout Sharpe is
+still negative. That is not the most flattering output, but it is the right one
+to leave in the repo. The point of the project is not to prove that every
+public sample says the strategy is great. The point is to show the full process:
+how sleeves are built, how they are selected, how costs matter, and what
+happens when a sanitized sample does not reproduce the private-run headline.
 
-Headline performance from [results/final_performance_summary.csv](../results/final_performance_summary.csv):
+At the same time, the repo does document the original challenge result
+separately. The preserved summary states that the original finalist submission
+reported net blind-holdout Sharpe above `1.3` after costs over
+`2022-01-01` to `2025-06-30`. That result is summarized in
+[reports/original_challenge_summary.md](original_challenge_summary.md) and the
+supporting CSV summaries in `results/`, but it is not falsely presented as a
+publicly reproduced backtest from the sanitized sample.
 
-| Strategy | Validation Sharpe | Holdout Sharpe | Holdout Total Return | Holdout Max DD | Holdout Ann Vol | Holdout Turnover |
-|---|---:|---:|---:|---:|---:|---:|
-| Buy & Hold QQQ | 0.26 | -0.45 | -26.0% | -40.1% | 21.0% | 0.00 |
-| Medium-Term Trend | 0.65 | 0.02 | -2.9% | -21.0% | 17.4% | 0.09 |
-| RSI Deep Value | 0.26 | -0.45 | -39.0% | -54.9% | 31.5% | 0.00 |
-| Dual Trend Macro | -0.34 | -0.91 | -40.2% | -44.6% | 19.8% | 0.10 |
-| Final Research Ensemble | 0.36 | -0.29 | -17.0% | -31.9% | 18.7% | 0.06 |
+So the cleanest way to read the project is:
 
-Interpretation:
+- the public repo proves the workflow, code path, and research discipline
+- the public sample gives an honest, runnable signal-comparison benchmark
+- the original challenge summary records the stronger private-run result that
+  motivated the project in the first place
 
-- The public-sample final ensemble improves holdout drawdown relative to buy-and-hold.
-- The public-sample holdout Sharpe remains negative, which is a useful reminder that validation success on a small sanitized sample does not guarantee durable out-of-sample alpha.
-- The medium-term trend sleeve is the cleanest individual public-sample performer in this version of the repo.
+The committed deliverables are therefore not just code. They are the code plus
+the decisions around it:
 
-## 7. Robustness
+- signal implementations in `src/`
+- a cost-aware no-lookahead backtest
+- selection and ensemble logic
+- CSV summaries for performance, cost sensitivity, parameter sensitivity, and
+  regimes
+- figure outputs for equity, drawdown, rolling Sharpe, and correlation
+- a project notebook and supporting notes
 
-### Cost sensitivity
-
-For the final research ensemble, holdout Sharpe degrades as one-way turnover cost increases:
-
-| Cost | Holdout Sharpe | Holdout Ann Return | Holdout Max DD |
-|---|---:|---:|---:|
-| 1 bps | -0.26 | -6.4% | -31.2% |
-| 5 bps | -0.29 | -6.9% | -31.9% |
-| 10 bps | -0.33 | -7.7% | -32.9% |
-| 20 bps | -0.41 | -9.1% | -34.8% |
-
-### Parameter sensitivity
-
-The committed parameter-sensitivity grid shows that:
-
-- `medium_term_trend` has the widest response range on holdout (`-0.05` to `0.26` Sharpe).
-- `rsi_deep_value` and `turn_of_month` are effectively invariant on the sanitized public sample, indicating the sample is too coarse to stress those sleeves meaningfully.
-
-### Regime analysis
-
-Structural regime summaries in [results/regime_summary.csv](../results/regime_summary.csv) show that the final ensemble:
-
-- holds up better than buy-and-hold in bear/high-vol and bear/low-vol drawdowns
-- remains strong in bull/high-vol regimes
-- gives up some upside in bull/low-vol regimes in exchange for shallower drawdowns
-
-## 8. Limitations
-
-- The public dataset is sanitized and shorter than the intended full-history research design.
-- DXY and cross-asset behavior are only as realistic as the committed public sample.
-- Daily close-to-close execution is idealized.
-- Costs, slippage, taxes, and borrow are still simplified.
-- A stronger public version would use a longer redistributable dataset and more diverse non-duplicate sleeves.
-
-## 9. Relationship to Original Challenge
-
-The results in this public report are generated from the sanitized sample dataset. They are included to demonstrate the reproducibility and mechanics of the codebase.
-
-The original challenge results were generated on a longer private dataset and are summarized separately in [reports/original_challenge_summary.md](original_challenge_summary.md). The public sample-data results are not intended to reproduce the original challenge Sharpe.
-
-The original private challenge run is documented as a summary result rather than a fully reproducible public artifact because the source dataset is not redistributed and the preserved public materials retained the headline after-cost Sharpe instead of the complete raw metric table.
-
-## 10. Deliverables
-
-The public repo now includes:
-
-- [results/final_performance_summary.csv](../results/final_performance_summary.csv)
-- [results/cost_sensitivity.csv](../results/cost_sensitivity.csv)
-- [results/parameter_sensitivity.csv](../results/parameter_sensitivity.csv)
-- [results/regime_summary.csv](../results/regime_summary.csv)
-- [figures/final_equity_curve.png](../figures/final_equity_curve.png)
-- [figures/final_drawdown.png](../figures/final_drawdown.png)
-- [figures/rolling_sharpe.png](../figures/rolling_sharpe.png)
-- [figures/cost_sensitivity.png](../figures/cost_sensitivity.png)
-- [figures/parameter_sensitivity_heatmap.png](../figures/parameter_sensitivity_heatmap.png)
-- [figures/regime_breakdown.png](../figures/regime_breakdown.png)
-- [notebooks/01_project_report.ipynb](../notebooks/01_project_report.ipynb)
-- [reports/original_challenge_summary.md](original_challenge_summary.md)
+That combination is what I wanted the repository to show: not “here is one
+backtest number,” but “here is the full research loop I used to build, test,
+select, and document the strategy.”

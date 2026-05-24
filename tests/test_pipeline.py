@@ -1,3 +1,5 @@
+"""Smoke tests for the public QQQ sample pipeline."""
+
 from pathlib import Path
 
 from src.config import BacktestConfig

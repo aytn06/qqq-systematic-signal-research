@@ -1,25 +1,21 @@
 # Notebooks
 
-Committed notebook:
+The committed notebook is:
 
 1. `01_project_report.ipynb`
-   - Public-facing walkthrough of the committed artifact pack.
-   - Covers data split, no-lookahead design, model selection, results, sensitivity, regimes, and limitations.
+   - the walkthrough I use to summarize the public sample, the split design,
+     model selection, result tables, and the main limitations
 
-Suggested follow-on notebooks:
+Natural follow-on notebooks if this repo grows:
 
 2. `02_signal_research.ipynb`
-   - Explore individual signal families.
-   - Plot exposures and returns.
-   - Explain signal intuition.
+   - inspect each sleeve's exposure path and trade behavior
 
 3. `03_validation_and_holdout.ipynb`
-   - Compare train/validation/holdout metrics.
-   - Show final strategy table.
+   - compare signal behavior across train, validation, and holdout
 
 4. `04_sensitivity_analysis.ipynb`
-   - Run ±10% parameter perturbations.
-   - Identify robust and fragile signals.
+   - run parameter perturbations and inspect fragile sleeves
 
 5. `05_regime_analysis.ipynb`
-   - Break down performance by bull/bear and high/low volatility regimes.
+   - break performance down by bull/bear and high/low volatility states

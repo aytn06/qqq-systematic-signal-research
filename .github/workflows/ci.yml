@@ -24,8 +24,8 @@ jobs:
       - name: Run tests
         run: pytest -q
 
-      - name: Run baseline backtest
+      - name: Run QQQ sample backtest
         run: python -m src.run_backtest
 
-      - name: Regenerate public artifacts
+      - name: Generate QQQ sample reports
         run: python -m src.generate_research_artifacts

@@ -1,3 +1,5 @@
+"""Signal definitions for daily QQQ exposure allocation."""
+
 from __future__ import annotations
 
 import pandas as pd

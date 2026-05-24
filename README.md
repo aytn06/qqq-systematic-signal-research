@@ -1,201 +1,144 @@
 # QQQ Systematic Signal Research
 
-Systematic QQQ signal research repository built around a Quanta QR Fellowship finalist project. The repo includes the signal-construction pipeline, the validation protocol, committed public artifacts, and a sanitized reproducible sample so the code can be run end to end without redistributing private challenge data.
+I built this repository around my Quanta QR Fellowship finalist project on
+systematic QQQ timing. The core idea was simple: instead of holding QQQ at a
+fixed 100% allocation, can I adjust exposure day by day with a small set of
+interpretable signals and get a cleaner risk/reward profile than buy-and-hold?
 
-The current public repo demonstrates:
+This repo is the runnable public version of that work. It includes the signal
+definitions, the no-lookahead backtest, the validation-based selection logic,
+and the scripts that generate the result tables and figures. The committed
+dataset is sanitized so the full pipeline can run end to end without
+redistributing the original private challenge data.
 
-- interpretable signal construction across several families
-- no-lookahead backtesting with explicit train / validation / holdout splits
-- transaction-cost modeling, sensitivity analysis, and regime diagnostics
-- committed figures, result tables, and a notebook/report pair for review
-- lightweight test coverage and CI for the runnable research workflow
+## What I Built
 
-## Reviewer Takeaway
+- a daily QQQ exposure-allocation pipeline with long, flat, and modest short
+  states
+- signal sleeves across trend, volatility, oversold mean reversion, cross-asset
+  confirmation, and seasonality
+- a backtest path that shifts exposures by one day and charges turnover costs
+- validation-only model selection for the final public ensemble
+- committed CSV and figure outputs so the project can be inspected without
+  rerunning everything
+- lightweight tests and CI for the public workflow
 
-This repository is intended to demonstrate the research process behind the project: clean signal implementation, no-lookahead backtesting, train/validation/holdout separation, transaction-cost modeling, sensitivity analysis, and regime evaluation.
+## Main Question
 
-The public sample-data results are not intended to reproduce the original private challenge Sharpe. The original challenge result is documented separately as a preserved summary statistic.
+The research question behind the project is:
 
-## What This Project Does
+> Can a diversified set of simple QQQ timing signals improve out-of-sample
+> risk-adjusted performance relative to buy-and-hold, while surviving
+> transaction costs and explicit train / validation / holdout discipline?
 
-The central question is:
+The project is a research backtest, not a production trading system. The point
+is to show the signal design, the validation protocol, and the tradeoffs that
+show up once the rules are tested honestly.
 
-> Can a diversified set of simple, interpretable QQQ timing signals improve out-of-sample risk-adjusted performance relative to buy-and-hold QQQ?
+## How The Pipeline Works
 
-The project focuses on process quality as much as raw Sharpe:
+The daily workflow is straightforward:
 
-- no-lookahead signal application
-- explicit train / validation / holdout periods
-- transaction-cost drag
-- parameter sensitivity checks
-- regime-aware analysis
+1. Load QQQ price and range data plus DXY from the input panel.
+2. Compute interpretable features such as moving averages, RSI, Parkinson
+   volatility, ATR-style shocks, rolling skew, and month-turn indicators.
+3. Map those features into target QQQ exposures in the bounded range
+   `[-1.0, 1.5]`.
+4. Apply the chosen exposure to the next day's QQQ return rather than the same
+   day's return.
+5. Charge one-way transaction costs based on absolute exposure changes.
+6. Compare signals on validation, build a final ensemble from the surviving
+   sleeves, and report holdout performance only after membership is fixed.
 
-This is a research backtest, not a production trading system.
+The important design choice is that every signal is interpretable. There is no
+black-box optimizer hiding behind the scenes. Each sleeve is a direct mapping
+from a market state to a target exposure.
 
-## Public Artifact vs. Original Challenge Results
+## Signal Set
 
-This repository contains a public, sanitized version of the QQQ signal-research framework. The included sample dataset is used to demonstrate the mechanics of the pipeline and to make the code runnable without redistributing private challenge data.
+The repo currently includes the following baseline sleeves:
 
-The original Quanta QR Fellowship finalist project used a longer QQQ dataset with the following protocol:
+| Signal | Family | What it does |
+|---|---|---|
+| `long_term_trend` | Trend | Stays strongly long above a long moving average and goes to cash otherwise |
+| `medium_term_trend` | Trend | Uses a 50-day EMA for tactical trend exposure |
+| `rsi_deep_value` | Vol / mean reversion | Buys deeply oversold selloffs even when volatility is elevated |
+| `rsi_gated_short` | Defensive volatility | Allows defensive short exposure but avoids shorting when QQQ is already oversold |
+| `conservative_fade` | Defensive volatility | Reduces risk as volatility rises and goes to cash in extreme conditions |
+| `vol_shock_dampener` | Risk control | Cuts exposure after unusually large true-range shocks |
+| `skew_filter` | Risk control | Avoids shorting when high-volatility returns also skew positive |
+| `dual_trend_macro` | Cross-asset macro | Combines QQQ trend with DXY trend to distinguish risk-on from risk-off states |
+| `turn_of_month` | Seasonality | Adds exposure around the last and first business days of the month |
+
+Each sleeve outputs a daily target exposure. The project then compares those
+exposure paths rather than comparing vague "ideas."
+
+## Original Project And Public Repo
+
+The original finalist project used a longer private QQQ history. This public
+repo keeps the pipeline runnable with a sanitized sample instead of trying to
+fake a full reproduction from incomplete public inputs.
+
+The original private-run protocol was:
 
 | Split | Dates | Purpose |
 |---|---:|---|
-| Train | 2000-01-01 to 2015-12-31 | Signal development |
-| Validation | 2016-01-01 to 2021-12-31 | Signal selection and ensemble construction |
+| Train | 2000-01-01 to 2015-12-31 | Develop and discard hypotheses |
+| Validation | 2016-01-01 to 2021-12-31 | Choose sleeves and build the final ensemble |
 | Blind holdout | 2022-01-01 to 2025-06-30 | Final out-of-sample evaluation |
 
-The public sample-data results should not be interpreted as the original challenge performance. Original challenge result summaries are documented in:
+The committed public dataset is shorter, so the public repo uses:
+
+| Public split | Dates | Purpose |
+|---|---:|---|
+| Train | 2018-01-01 to 2020-12-31 | First-pass signal work |
+| Validation | 2021-01-01 to 2022-12-31 | Public-sample model selection |
+| Holdout | 2023-01-01 to 2025-06-30 | Final public-sample evaluation |
+
+The public results are therefore best read as:
+
+- a fully runnable research implementation
+- an honest public sample of the workflow
+- not a claim that the sanitized dataset recreates the original finalist Sharpe
+
+The original challenge summary is documented separately in:
 
 - [reports/original_challenge_summary.md](reports/original_challenge_summary.md)
 - [reports/original_challenge_evidence/README.md](reports/original_challenge_evidence/README.md)
-- [reports/research_decisions.md](reports/research_decisions.md)
 - [results/original_challenge_performance_summary.csv](results/original_challenge_performance_summary.csv)
-- [results/original_challenge_signal_family_results.csv](results/original_challenge_signal_family_results.csv)
-- [results/original_challenge_cost_sensitivity.csv](results/original_challenge_cost_sensitivity.csv)
 
-## Repository Layout
+## How I Chose The Final Public Ensemble
 
-```text
-.
-├── data/                  # Input data contract and sanitized public sample
-├── figures/               # Committed final figures plus locally generated extras
-├── notebooks/             # Polished public notebook and suggested follow-ons
-├── reports/               # Short-form project summaries
-├── results/               # Committed final tables plus locally generated extras
-├── src/                   # Core research package
-├── tests/                 # Unit and smoke tests
-├── CONTRIBUTING.md        # Workflow and contribution guidance
-├── Makefile               # Common developer commands
-├── pyproject.toml         # Project metadata and optional editable install
-└── README.md
-```
+I did not pick the final public ensemble by eyeballing holdout Sharpe. The
+selection path in [src/generate_research_artifacts.py](src/generate_research_artifacts.py)
+uses validation-only information.
 
-## Quickstart
+The selection logic is:
 
-Create a virtual environment and install the project in editable mode:
+1. group signals by family
+2. rank each family representative using validation Sharpe, validation max
+   drawdown, turnover, and cost drag
+3. remove near-duplicate validation profiles so the final basket is not just
+   several versions of the same exposure path
+4. average the surviving sleeves and clip the final ensemble to the allowed
+   exposure range
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-pip install -e ".[dev]"
-```
-
-If you prefer a plain requirements install:
-
-```bash
-pip install -r requirements.txt
-```
-
-## Run The Pipeline
-
-The CLI defaults point at the included sample dataset, so the shortest path is:
-
-```bash
-python -m src.run_backtest
-python -m src.make_plots
-python -m src.generate_research_artifacts
-pytest
-```
-
-If you install the project in editable mode, these console scripts are also available:
-
-```bash
-qqq-backtest
-qqq-plots
-qqq-artifacts
-```
-
-You can override the defaults when using your own dataset:
-
-```bash
-python -m src.run_backtest \
-  --input data/sample_prices.csv \
-  --output results/performance_summary.csv
-
-python -m src.make_plots \
-  --input data/sample_prices.csv \
-  --output-dir figures
-
-python -m src.generate_research_artifacts \
-  --input data/sample_prices.csv \
-  --results-dir results \
-  --figures-dir figures
-```
-
-## Research Design
-
-The full research design this project aims for is:
-
-| Split | Dates | Purpose |
-|---|---:|---|
-| Train | 2000-01-01 to 2015-12-31 | Develop hypotheses |
-| Validation | 2016-01-01 to 2021-12-31 | Select and combine signals |
-| Holdout | 2022-01-01 to 2025-06-30 | Final out-of-sample evaluation |
-
-The holdout period should not be used for iterative signal selection.
-
-Because the public repository ships with a shorter sanitized sample dataset rather than the original full-history research inputs, the committed artifact pack uses a reproducible public split:
-
-| Public Split | Dates | Purpose |
-|---|---:|---|
-| Train | 2018-01-01 to 2020-12-31 | Signal ideation and first-pass filtering |
-| Validation | 2021-01-01 to 2022-12-31 | Model selection and ensemble design |
-| Holdout | 2023-01-01 to 2025-06-30 | Final evaluation on the public sample |
-
-## Included Signal Families
-
-The current baseline signal set includes:
-
-| Signal | Family | Description |
-|---|---|---|
-| `long_term_trend` | Trend | Long when QQQ is above a long moving average |
-| `medium_term_trend` | Trend | Medium-horizon tactical trend signal |
-| `rsi_deep_value` | Vol / mean reversion | Buys deeply oversold, high-volatility selloffs |
-| `rsi_gated_short` | Defensive | Avoids shorting into already oversold conditions |
-| `conservative_fade` | Defensive | Reduces risk during extreme volatility |
-| `vol_shock_dampener` | Risk control | Cuts exposure after unusually large true-range shocks |
-| `skew_filter` | Risk control | Avoids shorting when high-volatility returns skew positive |
-| `dual_trend_macro` | Cross-asset | Combines QQQ trend with DXY trend |
-| `turn_of_month` | Seasonality | Adds risk around month-turn behavior |
-
-The repo now publishes two ensemble views:
-
-- `equal_weight_ensemble`: baseline average of the full signal zoo
-- `final_research_ensemble`: validation-selected blend of the final public-sample sleeves
-
-## Model Selection Protocol
-
-Signals are developed at the individual-sleeve level first and evaluated on the validation window before any final ensemble is formed.
-
-The public artifact pack uses the following selection rules:
-
-1. Group candidate signals by family.
-2. Within each family, rank signals with a validation-only score that rewards higher Sharpe and shallower drawdowns while lightly penalizing turnover and cost drag.
-3. Remove near-duplicate validation profiles so the final basket is not just the same sleeve repeated under different names.
-4. Build the final ensemble from the surviving family representatives and clip exposure to the allowed range.
-5. Report holdout metrics only after the ensemble membership is already fixed.
-
-On the current public sample, this produces a final ensemble composed of:
+On the committed public sample, the final ensemble contains:
 
 - `medium_term_trend`
 - `rsi_deep_value`
 - `turn_of_month`
 
-The selection summary is committed in [results/model_selection_summary.csv](results/model_selection_summary.csv) and the per-family comparison lives in [results/signal_family_results.csv](results/signal_family_results.csv).
+The detailed ranking lives in:
 
-## What Changed During Research
+- [results/model_selection_summary.csv](results/model_selection_summary.csv)
+- [results/signal_family_results.csv](results/signal_family_results.csv)
+- [reports/research_decisions.md](reports/research_decisions.md)
 
-The repo now includes a short decision log in [reports/research_decisions.md](reports/research_decisions.md). The most important project-level changes were:
+## Public Sample Results
 
-- defensive sleeves such as `conservative_fade`, `rsi_gated_short`, and `skew_filter` were left out of the final public ensemble because their validation profiles largely duplicated `rsi_deep_value`
-- `dual_trend_macro` remained in the comparison set for cross-asset context, but it did not survive validation-only family ranking on the committed public sample
-- family selection was tightened to use a validation-only score after removing holdout leakage from the artifact-generation path
-- the negative public-sample holdout result was kept in the repo rather than swapped out for a more flattering but less honest artifact pack
-
-## Headline Results
-
-The committed results below come from the reproducible public sample split and the default 5 bps one-way turnover cost assumption.
+The table below comes from the committed public sample and the default 5 bps
+one-way turnover cost assumption.
 
 | Strategy | Validation Sharpe | Holdout Sharpe | Holdout Max DD | Holdout Ann Vol | Holdout Turnover | Cost |
 |---|---:|---:|---:|---:|---:|---:|
@@ -205,12 +148,17 @@ The committed results below come from the reproducible public sample split and t
 | Dual Trend Macro | -0.34 | -0.91 | -44.6% | 19.8% | 0.10 | 5 bps |
 | Final Research Ensemble | 0.36 | -0.29 | -31.9% | 18.7% | 0.06 | 5 bps |
 
-Two things are important here:
+The public sample tells a mixed but useful story:
 
-- The public-sample final ensemble improves holdout drawdown versus the benchmark (`-31.9%` vs `-40.1%`).
-- It still fails to produce a positive holdout Sharpe on the committed public sample, which is exactly the kind of non-cherry-picked result worth showing in a serious research repo.
+- the final public ensemble reduces holdout drawdown relative to buy-and-hold
+- the public holdout Sharpe is still negative
+- the medium-term trend sleeve is the cleanest standalone public-sample result
 
-See the committed artifact pack for the supporting tables and figures:
+I kept that negative public holdout in the repo on purpose. The project is more
+credible with a real tradeoff than it would be with a cleaned-up story that
+only kept flattering outputs.
+
+Supporting files:
 
 - [results/final_performance_summary.csv](results/final_performance_summary.csv)
 - [results/cost_sensitivity.csv](results/cost_sensitivity.csv)
@@ -219,72 +167,80 @@ See the committed artifact pack for the supporting tables and figures:
 - [figures/final_equity_curve.png](figures/final_equity_curve.png)
 - [figures/final_drawdown.png](figures/final_drawdown.png)
 - [figures/rolling_sharpe.png](figures/rolling_sharpe.png)
-- [figures/signal_correlation_heatmap.png](figures/signal_correlation_heatmap.png)
 - [figures/cost_sensitivity.png](figures/cost_sensitivity.png)
 - [figures/parameter_sensitivity_heatmap.png](figures/parameter_sensitivity_heatmap.png)
 - [figures/regime_breakdown.png](figures/regime_breakdown.png)
 
-## Data Contract
+## Data
 
-The pipeline expects at least these columns:
+The pipeline expects at least:
 
 ```text
 date,qqq_close,qqq_high,qqq_low,dxy_close
 ```
 
-Optional future columns can include:
+The committed [data/sample_prices.csv](data/sample_prices.csv) file is a
+sanitized public sample covering `2018-01-02` through `2025-06-30`. It exists
+so the full pipeline can run locally and in CI. It is not the same thing as the
+private full-history dataset used in the original finalist project.
 
-```text
-qqq_volume,spy_close,vix_close,tlt_close,rates_10y
+## Run The Project
+
+Create a virtual environment and install in editable mode:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
 ```
 
-The included `data/sample_prices.csv` is a sanitized public sample spanning `2018-01-02` through `2025-06-30`. It is useful for validating the mechanics of the repo and for shipping a reproducible public artifact pack, but it is not the same thing as the private full-history research dataset that originally motivated the project.
+Then run the baseline workflow:
 
-Do not commit proprietary or licensed market data. Use [data/README.md](data/README.md) to document local datasets instead.
+```bash
+python -m src.run_backtest
+python -m src.make_plots
+python -m src.generate_research_artifacts
+pytest
+```
 
-## Public Artifact Pack
+The CLI defaults point at the included public sample, so those commands work
+without extra arguments.
 
-The repo now includes a committed public-facing artifact pack so reviewers do not need to run the code just to understand the project:
+Console scripts are also installed:
 
-- [notebooks/01_project_report.ipynb](notebooks/01_project_report.ipynb): polished walk-through notebook
-- [reports/final_project_report.md](reports/final_project_report.md): concise research memo
-- [reports/research_decisions.md](reports/research_decisions.md): concrete iteration notes and signal-selection rationale
-- [results/public_data_split.csv](results/public_data_split.csv): exact split boundaries used for the public sample
-- final summary, cost, parameter, and regime CSV outputs in `results/`
-- final plots in `figures/`
+```bash
+qqq-backtest
+qqq-plots
+qqq-artifacts
+```
 
-## Developer Workflow
+## Repository Layout
 
-The repo includes a small but practical development loop:
+```text
+.
+├── data/                  # Public sample data and input schema notes
+├── figures/               # Committed plots from the public sample run
+├── notebooks/             # Walkthrough notebook
+├── reports/               # Project summaries and supporting notes
+├── results/               # Final tables generated from the public sample
+├── src/                   # Signal, backtest, metrics, and report-generation code
+├── tests/                 # Unit and pipeline smoke tests
+├── CONTRIBUTING.md
+├── Makefile
+├── pyproject.toml
+└── README.md
+```
 
-- `Makefile` for common setup and run commands
-- `pytest` smoke tests for data loading, metrics, and backtest mechanics
-- GitHub Actions CI in `.github/workflows/ci.yml`
+## Notes
 
-Recommended loop:
+This repo is most useful as evidence of how I approached the problem:
 
-1. Add or adjust one signal family at a time.
-2. Re-run the backtest summary.
-3. Re-generate the public artifact pack.
-4. Run tests before pushing.
-5. Preserve holdout discipline.
+- define a small, interpretable signal zoo
+- backtest with shifted exposures and explicit costs
+- separate validation from holdout
+- document what survived and what did not
 
-## Current Limitations
-
-- Daily close-to-close execution is idealized.
-- Transaction costs are simplified to one-way turnover costs.
-- Borrow, slippage, taxes, and capacity are not modeled.
-- The package name is intentionally lightweight and geared toward repo ergonomics, not distribution polish.
-- The public sample is sanitized and shorter than the original research ambition.
-- Some sleeves are piecewise-constant on the public sample, which makes parameter sensitivity less informative than it would be on a richer dataset.
-
-## Good Next Steps
-
-- Swap the public sample for a redistributable historical dataset with the full intended train/validation/holdout span.
-- Expand the signal zoo with truly distinct macro and volatility sleeves.
-- Add richer cost models, slippage assumptions, and explicit rebalance constraints.
-- Add notebook outputs or a rendered report artifact for easier browser-only review.
-
-## Resume-Friendly Summary
-
-> Built a systematic QQQ signal-research pipeline with strict train/validation/holdout separation, no-lookahead backtesting, transaction-cost modeling, regime-aware evaluation, and GitHub-ready project scaffolding.
+It is not meant to claim that a sanitized public sample fully proves the
+original private-run challenge result. It is meant to show the actual research
+pipeline behind that project in a form that is runnable and inspectable.
