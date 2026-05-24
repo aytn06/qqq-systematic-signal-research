@@ -1,0 +1,314 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=0.95in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{array}
+
+\definecolor{accent}{RGB}{18,54,92}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt}
+
+\title{\textbf{A Full Explanation of the QQQ Systematic Signal Research Project}}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\section*{Introduction}
+
+This project began with a simple but serious question: can a disciplined set of
+interpretable timing rules improve the risk-adjusted performance of QQQ relative
+to simply buying it and holding it? The attraction of QQQ is obvious. It gives
+concentrated exposure to large-cap growth and technology, and over long periods
+it has delivered strong upside. The difficulty is equally obvious. QQQ also
+comes with deep drawdowns, sharp reversals, and periods in which trend,
+volatility, and macro conditions interact in ways that make passive exposure
+painful. The project therefore does not ask whether QQQ is a good asset in the
+long run. It asks whether exposure to QQQ can be managed more intelligently.
+
+The central idea is not stock picking and it is not black-box prediction. The
+project is about \emph{exposure management}. On each day, the system decides how
+much QQQ exposure should be held on the next day. Sometimes that desired
+exposure is strongly long. Sometimes it is flat. Sometimes it is slightly
+short. Those decisions are driven by a small set of understandable signals
+related to trend, oversold conditions, volatility regimes, cross-asset
+confirmation, and seasonality. The project is therefore best understood as a
+market-timing research pipeline with explicit backtesting, validation, and
+artifact generation, rather than as a one-off trading notebook.
+
+\section*{What the Project Is Trying to Solve}
+
+Buy-and-hold QQQ has a structural weakness: it treats all market states the
+same. A strong uptrend, a volatility shock, an oversold crash, and a weak
+macro regime all receive the same portfolio response. That is attractive for
+simplicity, but it means the investor absorbs the full force of every drawdown
+and every regime transition. The project studies whether a diversified set of
+rules can respond differently to those environments without collapsing into
+curve-fitted complexity.
+
+The research problem is therefore not ``can I predict tomorrow's QQQ return
+perfectly?'' That would be both unrealistic and conceptually vague. The real
+problem is narrower and more defensible. If QQQ is above trend, perhaps it
+deserves more exposure. If QQQ is violently oversold, perhaps a mean-reversion
+signal should dominate. If volatility becomes extreme, perhaps gross risk should
+be cut. If the dollar is strengthening while QQQ trend deteriorates, perhaps a
+macro confirmation filter should turn more defensive. The project asks whether a
+well-designed combination of such signals can improve the return-risk tradeoff
+once one accounts for transaction costs and out-of-sample validation.
+
+\section*{The Data and the Public-versus-Private Distinction}
+
+One of the most important things to understand about the repository is that it
+contains both a public, reproducible research framework and a documented summary
+of the original Quanta QR Fellowship finalist submission. These are related, but
+they are not identical. The public repository ships with a sanitized sample
+dataset spanning \texttt{2018-01-02} through \texttt{2025-06-30}. At minimum,
+that dataset contains the columns \texttt{date}, \texttt{qqq\_close},
+\texttt{qqq\_high}, \texttt{qqq\_low}, and \texttt{dxy\_close}. Those columns
+are enough to reproduce the signal mechanics, backtest logic, result tables, and
+plots without redistributing private challenge data.
+
+The original challenge project, however, used a longer private history. Its
+intended split was:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Split} & \textbf{Dates} & \textbf{Purpose} \\
+\midrule
+Train & 2000-01-01 to 2015-12-31 & Hypothesis development \\
+Validation & 2016-01-01 to 2021-12-31 & Signal selection and ensemble design \\
+Blind holdout & 2022-01-01 to 2025-06-30 & Final out-of-sample evaluation \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Because the public sample begins in 2018, the committed artifact pack adapts the
+split in a transparent way:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Public split} & \textbf{Dates} & \textbf{Purpose} \\
+\midrule
+Train & 2018-01-01 to 2020-12-31 & First-pass design and filtering \\
+Validation & 2021-01-01 to 2022-12-31 & Selection of final sleeves \\
+Holdout & 2023-01-01 to 2025-06-30 & Final public out-of-sample evaluation \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+This distinction matters because it explains why the public results are not
+supposed to reproduce the original headline Sharpe. The public sample exists so
+that the mechanics of the project are inspectable. The original challenge
+summary exists so that the stronger private-run result is not erased. The
+repository is explicit about this split because hiding it would make the project
+less credible, not more.
+
+\section*{What a Signal Means in This Project}
+
+Each signal in the project outputs a daily target exposure to QQQ. Exposure is
+bounded in the range \([-1.0, 1.5]\), where \(-1.0\) means fully short QQQ,
+\(0.0\) means no exposure, \(1.0\) means fully long QQQ, and \(1.5\) means
+levered long exposure. This framing is important because it clarifies what the
+system is doing. The project is not trying to classify each day as ``up'' or
+``down.'' It is deciding how aggressively or defensively to hold QQQ given the
+information currently available.
+
+The signal set was chosen to remain interpretable. The trend sleeves ask whether
+QQQ is above long or medium moving averages. The volatility and mean-reversion
+sleeves ask whether realized range-based volatility is low, high, or extreme,
+and whether RSI indicates a deeply oversold condition. The risk-control sleeves
+look for shock behavior or skew patterns that may make short exposure dangerous.
+The macro sleeve uses DXY trend as a confirmation filter. The seasonality sleeve
+encodes turn-of-month behavior. None of these are intended to be mystical. The
+point is to build a diversified zoo of transparent hypotheses and test them
+under a common framework.
+
+\section*{How the Individual Signals Behave}
+
+The simplest signal in the repo is the long-term trend sleeve. If QQQ is above a
+long moving average, the model holds a high long exposure. If QQQ is below that
+long-term trend threshold, it goes to cash. This is a classic trend-following
+rule and serves as a baseline for the idea that persistent strength should be
+respected rather than faded.
+
+The medium-term trend sleeve is more tactical. It uses a shorter exponential
+moving average and allows mild short exposure when QQQ drops below that trend.
+This makes it more responsive and more active than the long-term sleeve, which
+is why it becomes the strongest trend representative on the public sample.
+
+The volatility and mean-reversion logic is concentrated in \texttt{rsi\_deep\_value}.
+This sleeve is designed around the idea that deeply oversold selloffs should not
+always be treated as invitations to go risk-off. If volatility is elevated but
+the market is extremely oversold, the sleeve overrides the usual defensive logic
+and becomes aggressively long, attempting to capture rebound behavior rather than
+selling the hole.
+
+The defensive sleeves, such as \texttt{rsi\_gated\_short},
+\texttt{conservative\_fade}, \texttt{vol\_shock\_dampener}, and
+\texttt{skew\_filter}, are all attempts to formalize the same broad intuition:
+there are environments in which naive shorting or naive persistence of trend
+exposure becomes dangerous. Those sleeves cut or neutralize exposure when
+volatility, range, or skew patterns become too extreme.
+
+The macro sleeve, \texttt{dual\_trend\_macro}, asks whether QQQ trend should be
+trusted equally when the dollar is strengthening versus when it is weakening. It
+is a simple way of encoding the idea that macro risk appetite may not be fully
+captured by QQQ price alone. Finally, the \texttt{turn\_of\_month} sleeve captures
+a simple calendar effect by raising exposure around month-end and the start of a
+new month.
+
+\section*{How the Backtest Works}
+
+The backtest is intentionally conservative. A signal is computed at time \(t\),
+but the resulting exposure is applied to the \emph{next} close-to-close return,
+not the same-day return. That one-day shift is an important design choice,
+because it avoids accidental look-ahead bias. The project is therefore trying to
+answer the question, ``if I knew today's information, what exposure should I
+hold on the next day?''
+
+For each strategy, the backtest records exposure, applied exposure, gross
+return, turnover, transaction cost, and net return. Transaction costs are
+modeled as one-way cost per unit turnover, with the public artifact pack using a
+default assumption of 5 basis points. Turnover is measured directly from changes
+in exposure from one day to the next. This means that more active signals are
+penalized appropriately, and any apparently attractive sleeve has to survive not
+only out-of-sample evaluation but also trading friction.
+
+The resulting backtest is therefore not merely a curve of cumulative returns. It
+is a mechanically explicit mapping from signal series to implemented next-day
+exposures, and from those exposures to cost-adjusted P\&L.
+
+\section*{How the Final Ensemble Was Chosen}
+
+The final public ensemble was not formed by averaging every signal in the zoo.
+Instead, the project uses a validation-only ranking process. Each signal is
+assigned to a family. Within each family, sleeves are ranked using a score that
+rewards higher validation Sharpe and shallower drawdowns while penalizing
+turnover and annualized cost drag. Signals with near-duplicate validation
+profiles are filtered out so that the final ensemble does not simply repeat the
+same behavior under multiple names.
+
+On the committed public sample, that process leaves three sleeves, which can be
+described in plain language as a medium-term trend sleeve, an oversold
+mean-reversion sleeve, and a turn-of-month sleeve. The final public ensemble is
+the clipped combination of those three. This is conceptually useful because it means the final blend
+contains one trend sleeve, one oversold/volatility sleeve, and one seasonality
+sleeve. In other words, the ensemble is trying to diversify \emph{research
+logic}, not just average many versions of the same idea.
+
+\section*{How to Read the Main Metrics}
+
+Sharpe ratio measures return per unit of volatility, so it is the main
+risk-adjusted performance metric in the project. Max drawdown measures the worst
+peak-to-trough loss. Turnover measures how aggressively exposure changes from day
+to day. Cost drag translates that turnover into performance lost to friction.
+Validation metrics are used for selection, while holdout metrics are used for
+final out-of-sample evaluation. This distinction is crucial. A good-looking
+validation result is only interesting if it survives on holdout after the
+selection process is already fixed.
+
+\section*{What the Public Results Actually Show}
+
+The headline public results at 5 bps one-way cost are:
+
+\begin{center}
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.28\textwidth} >{\raggedleft\arraybackslash}p{0.10\textwidth} >{\raggedleft\arraybackslash}p{0.12\textwidth} >{\raggedleft\arraybackslash}p{0.13\textwidth} >{\raggedleft\arraybackslash}p{0.12\textwidth} >{\raggedleft\arraybackslash}p{0.09\textwidth}@{}}
+\toprule
+\textbf{Strategy} & \shortstack{\textbf{Val}\\\textbf{Sharpe}} & \shortstack{\textbf{Holdout}\\\textbf{Sharpe}} & \shortstack{\textbf{Holdout}\\\textbf{Return}} & \shortstack{\textbf{Holdout}\\\textbf{Max DD}} & \shortstack{\textbf{Turn}\\\textbf{over}} \\
+\midrule
+Buy \& Hold QQQ & 0.26 & -0.45 & -26.0\% & -40.1\% & 0.00 \\
+Medium-Term Trend & 0.65 & 0.02 & -2.9\% & -21.0\% & 0.09 \\
+RSI Deep Value & 0.26 & -0.45 & -39.0\% & -54.9\% & 0.00 \\
+Dual Trend Macro & -0.34 & -0.91 & -40.2\% & -44.6\% & 0.10 \\
+Final Research Ensemble & 0.36 & -0.29 & -17.0\% & -31.9\% & 0.06 \\
+\bottomrule
+\end{tabular}
+\normalsize
+\end{center}
+
+The most important thing about this table is that it is \emph{not flattering},
+and that is part of what makes it credible. The public-sample final ensemble did
+not produce positive holdout Sharpe. The medium-term trend sleeve is the
+cleanest individual public performer, but even that sleeve has only slightly
+positive holdout Sharpe. The final research ensemble, however, did improve
+drawdown versus buy-and-hold: its holdout max drawdown was materially shallower
+than the passive benchmark. In other words, the public sample suggests that
+exposure management helped more on downside control than on outright alpha.
+
+That matters conceptually. A serious research project is allowed to conclude
+that a public sample is not strong enough to support a pretty headline. In fact,
+keeping that result in the repo is evidence that the project prioritizes
+research discipline over cosmetic storytelling.
+
+\section*{What the Original Quanta Challenge Result Was}
+
+The original Quanta QR Fellowship finalist submission is documented separately
+in the original challenge summary report because the longer private dataset is
+not redistributed. The preserved challenge materials report that the final
+ensemble achieved net blind-holdout Sharpe above \(1.3\) after costs over the
+period from January 1, 2022 through June 30, 2025. That is the result behind
+the CV line.
+
+So the honest interpretation of the project is the following. The public repo
+demonstrates the mechanics: signal construction, no-lookahead backtesting,
+validation-only selection, cost modeling, sensitivity analysis, regime
+diagnostics, and artifact generation. The original private-run summary is what
+supports the stronger headline performance claim. The repository is careful not
+to blur those two things together.
+
+\section*{What the Project Lets Us Infer}
+
+The strongest inference is not that the public sample proves a durable edge. The
+strongest inference is that a disciplined timing research process can be built
+around simple and interpretable sleeves, and that drawdown-aware exposure
+management can be meaningfully separated from pure buy-and-hold behavior. The
+project also shows that family diversity matters. Several defensive sleeves
+turned out to be near-duplicates of \texttt{rsi\_deep\_value} on the public
+sample, and that finding is just as informative as a strong positive metric
+would have been. It tells us that naming a signal differently is not the same as
+having a genuinely distinct source of behavior.
+
+The project also demonstrates that validation and holdout discipline are not
+minor implementation details. An earlier version of the artifact generation path
+had holdout leakage in the selection logic. That was removed, and the final
+public ensemble is now selected with a validation-only score. This is one of the
+most important research decisions in the whole repo, because it reinforces the
+principle that out-of-sample results should be reported, not optimized.
+
+\section*{Limitations}
+
+The public repository is careful about its own limits. The public data is
+sanitized and shorter than the intended full-history design. DXY and
+cross-asset behavior are only as realistic as the committed sample permits.
+Daily close-to-close execution is idealized. Transaction costs are simplified.
+And the stronger original challenge result is still documented as a preserved
+summary rather than a fully reproducible raw historical backtest. None of these
+limitations destroy the value of the project, but they do define the right
+interpretation. This is a research framework and documented research artifact,
+not a production trading system.
+
+\section*{Conclusion}
+
+The QQQ project is best understood as a serious systematic research pipeline for
+timing exposure to a single highly liquid ETF using a diversified set of simple
+signals. Its real strength is methodological clarity: interpretable sleeves,
+explicit train / validation / holdout structure, no-lookahead mechanics,
+transaction-cost accounting, public artifacts, and honest retention of
+unflattering public-sample results. That is precisely why it works well as a
+public-facing project. It does not ask the reviewer to take the process on
+faith. It shows the process directly, and then clearly distinguishes that public
+framework from the stronger private-run result that originally motivated it.
+
+\end{document}
