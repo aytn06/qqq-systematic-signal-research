@@ -5,10 +5,10 @@ systematic QQQ timing. The core idea was simple: instead of holding QQQ at a
 fixed 100% allocation, can I adjust exposure day by day with a small set of
 interpretable signals and get a cleaner risk/reward profile than buy-and-hold?
 
-This repo is the runnable public version of that work. It includes the signal
-definitions, the no-lookahead backtest, the validation-based selection logic,
-and the scripts that generate the result tables and figures. The committed
-dataset is sanitized so the full pipeline can run end to end without
+This repo contains the full runnable pipeline behind that work. It includes the
+signal definitions, the no-lookahead backtest, the validation-based selection
+logic, and the scripts that generate the result tables and figures. The
+committed dataset is sanitized so the full pipeline can run end to end without
 redistributing the original private challenge data.
 
 ## What I Built
@@ -18,7 +18,7 @@ redistributing the original private challenge data.
 - signal sleeves across trend, volatility, oversold mean reversion, cross-asset
   confirmation, and seasonality
 - a backtest path that shifts exposures by one day and charges turnover costs
-- validation-only model selection for the final public ensemble
+- validation-only model selection for the final committed ensemble
 - committed CSV and figure outputs so the project can be inspected without
   rerunning everything
 - lightweight tests and CI for the public workflow
@@ -73,11 +73,11 @@ The repo currently includes the following baseline sleeves:
 Each sleeve outputs a daily target exposure. The project then compares those
 exposure paths rather than comparing vague "ideas."
 
-## Original Project And Public Repo
+## Original Project And Included Dataset
 
-The original finalist project used a longer private QQQ history. This public
-repo keeps the pipeline runnable with a sanitized sample instead of trying to
-fake a full reproduction from incomplete public inputs.
+The original finalist project used a longer private QQQ history. This repo
+keeps the full code path runnable with a sanitized dataset instead of pretending
+that incomplete public inputs are the original challenge data.
 
 The original private-run protocol was:
 
@@ -87,7 +87,7 @@ The original private-run protocol was:
 | Validation | 2016-01-01 to 2021-12-31 | Choose sleeves and build the final ensemble |
 | Blind holdout | 2022-01-01 to 2025-06-30 | Final out-of-sample evaluation |
 
-The committed public dataset is shorter, so the public repo uses:
+The committed dataset is shorter, so the repo uses:
 
 | Public split | Dates | Purpose |
 |---|---:|---|
@@ -95,7 +95,7 @@ The committed public dataset is shorter, so the public repo uses:
 | Validation | 2021-01-01 to 2022-12-31 | Public-sample model selection |
 | Holdout | 2023-01-01 to 2025-06-30 | Final public-sample evaluation |
 
-The public results are therefore best read as:
+The repo should therefore be read as:
 
 - a fully runnable research implementation
 - an honest public sample of the workflow
@@ -107,9 +107,9 @@ The original challenge summary is documented separately in:
 - [reports/original_challenge_evidence/README.md](reports/original_challenge_evidence/README.md)
 - [results/original_challenge_performance_summary.csv](results/original_challenge_performance_summary.csv)
 
-## How I Chose The Final Public Ensemble
+## How I Chose The Final Ensemble
 
-I did not pick the final public ensemble by eyeballing holdout Sharpe. The
+I did not pick the final ensemble by eyeballing holdout Sharpe. The
 selection path in [src/generate_research_artifacts.py](src/generate_research_artifacts.py)
 uses validation-only information.
 
@@ -135,7 +135,7 @@ The detailed ranking lives in:
 - [results/signal_family_results.csv](results/signal_family_results.csv)
 - [reports/research_decisions.md](reports/research_decisions.md)
 
-## Public Sample Results
+## Results On The Included Dataset
 
 The table below comes from the committed public sample and the default 5 bps
 one-way turnover cost assumption.
@@ -148,13 +148,14 @@ one-way turnover cost assumption.
 | Dual Trend Macro | -0.34 | -0.91 | -44.6% | 19.8% | 0.10 | 5 bps |
 | Final Research Ensemble | 0.36 | -0.29 | -31.9% | 18.7% | 0.06 | 5 bps |
 
-The public sample tells a mixed but useful story:
+The included dataset tells a mixed but useful story:
 
-- the final public ensemble reduces holdout drawdown relative to buy-and-hold
-- the public holdout Sharpe is still negative
-- the medium-term trend sleeve is the cleanest standalone public-sample result
+- the final ensemble reduces holdout drawdown relative to buy-and-hold
+- the holdout Sharpe is still negative
+- the medium-term trend sleeve is the cleanest standalone result on the
+  committed sample
 
-I kept that negative public holdout in the repo on purpose. The project is more
+I kept that negative holdout in the repo on purpose. The project is more
 credible with a real tradeoff than it would be with a cleaned-up story that
 only kept flattering outputs.
 
@@ -180,8 +181,8 @@ date,qqq_close,qqq_high,qqq_low,dxy_close
 ```
 
 The committed [data/sample_prices.csv](data/sample_prices.csv) file is a
-sanitized public sample covering `2018-01-02` through `2025-06-30`. It exists
-so the full pipeline can run locally and in CI. It is not the same thing as the
+sanitized dataset covering `2018-01-02` through `2025-06-30`. It exists so the
+full pipeline can run locally and in CI. It is not the same thing as the
 private full-history dataset used in the original finalist project.
 
 ## Run The Project
@@ -204,7 +205,7 @@ python -m src.generate_research_artifacts
 pytest
 ```
 
-The CLI defaults point at the included public sample, so those commands work
+The CLI defaults point at the included dataset, so those commands work
 without extra arguments.
 
 Console scripts are also installed:
@@ -212,18 +213,17 @@ Console scripts are also installed:
 ```bash
 qqq-backtest
 qqq-plots
-qqq-artifacts
 ```
 
 ## Repository Layout
 
 ```text
 .
-├── data/                  # Public sample data and input schema notes
-├── figures/               # Committed plots from the public sample run
+├── data/                  # Committed dataset and input schema notes
+├── figures/               # Committed plots from the included dataset run
 ├── notebooks/             # Walkthrough notebook
 ├── reports/               # Project summaries and supporting notes
-├── results/               # Final tables generated from the public sample
+├── results/               # Final tables generated from the included dataset
 ├── src/                   # Signal, backtest, metrics, and report-generation code
 ├── tests/                 # Unit and pipeline smoke tests
 ├── CONTRIBUTING.md
@@ -241,6 +241,6 @@ This repo is most useful as evidence of how I approached the problem:
 - separate validation from holdout
 - document what survived and what did not
 
-It is not meant to claim that a sanitized public sample fully proves the
-original private-run challenge result. It is meant to show the actual research
-pipeline behind that project in a form that is runnable and inspectable.
+It does not claim that the included dataset fully proves the private-run
+challenge result. It is meant to show the actual research pipeline behind that
+project in a form that is runnable and inspectable.

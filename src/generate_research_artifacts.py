@@ -62,7 +62,7 @@ def ensure_matplotlib_cache_dir() -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     return argparse.ArgumentParser(
-        description="Generate public-facing research artifacts and figures for the QQQ signal project.",
+        description="Generate the committed result tables and figures for the QQQ signal project.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
@@ -255,8 +255,8 @@ def main() -> None:
 
     parser = build_parser()
     parser.add_argument("--input", default=DEFAULT_INPUT, help="Path to the public data CSV.")
-    parser.add_argument("--results-dir", default=DEFAULT_RESULTS_DIR, help="Directory for generated CSV artifacts.")
-    parser.add_argument("--figures-dir", default=DEFAULT_FIGURES_DIR, help="Directory for generated figure artifacts.")
+    parser.add_argument("--results-dir", default=DEFAULT_RESULTS_DIR, help="Directory for generated CSV results.")
+    parser.add_argument("--figures-dir", default=DEFAULT_FIGURES_DIR, help="Directory for generated figures.")
     args = parser.parse_args()
 
     results_dir = Path(args.results_dir)
@@ -417,7 +417,7 @@ def main() -> None:
 
     save_public_split(config, results_dir / "public_data_split.csv")
 
-    print(f"Wrote research artifacts to {results_dir} and {figures_dir}")
+    print(f"Wrote results and figures to {results_dir} and {figures_dir}")
 
 
 if __name__ == "__main__":

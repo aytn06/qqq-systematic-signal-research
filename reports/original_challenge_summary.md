@@ -4,7 +4,10 @@
 
 This report summarizes the original QQQ signal-research project completed for the Quanta QR Fellowship finalist challenge.
 
-The public repository contains a sanitized reproducible version of the research framework. The included sample data is used to demonstrate the mechanics of the pipeline: signal construction, no-lookahead backtesting, transaction-cost modeling, sensitivity analysis, and regime evaluation.
+This repository contains the runnable version of the research framework. The
+included dataset is sanitized, but it still shows the mechanics of the
+pipeline: signal construction, no-lookahead backtesting, transaction-cost
+modeling, sensitivity analysis, and regime evaluation.
 
 The original challenge used a longer private QQQ dataset. The raw data is not redistributed here, but the research protocol and final result summaries are documented below.
 
@@ -46,7 +49,11 @@ The final research process evaluated signals across the following families:
 
 The preserved challenge materials report that the final ensemble achieved net blind-holdout Sharpe above 1.3 after transaction costs over 2022-01-01 to 2025-06-30.
 
-Exact full metric tables from the private challenge run are not redistributed here because the original dataset is not public and the preserved public materials retained the headline result rather than the complete raw output. This repository therefore documents the original result as a summary statistic, not as a fully reproducible public backtest artifact.
+Exact full metric tables from the private challenge run are not redistributed
+here because the original dataset is not public and the preserved materials
+retained the headline result rather than the complete raw output. This
+repository therefore documents the original result as a summary statistic, not
+as a fully reproduced private-run backtest table.
 
 | Strategy | Validation Sharpe | Blind-Holdout Sharpe | Max Drawdown | Notes |
 |---|---:|---:|---:|---|

@@ -43,7 +43,7 @@ short. Those decisions are driven by a small set of understandable signals
 related to trend, oversold conditions, volatility regimes, cross-asset
 confirmation, and seasonality. The project is therefore best understood as a
 market-timing research pipeline with explicit backtesting, validation, and
-artifact generation, rather than as a one-off trading notebook.
+report generation, rather than as a one-off trading notebook.
 
 \section*{What the Project Is Trying to Solve}
 
@@ -92,7 +92,7 @@ Blind holdout & 2022-01-01 to 2025-06-30 & Final out-of-sample evaluation \\
 \end{tabular}
 \end{center}
 
-Because the public sample begins in 2018, the committed artifact pack adapts the
+Because the public sample begins in 2018, the committed results adapts the
 split in a transparent way:
 
 \begin{center}
@@ -179,7 +179,7 @@ hold on the next day?''
 
 For each strategy, the backtest records exposure, applied exposure, gross
 return, turnover, transaction cost, and net return. Transaction costs are
-modeled as one-way cost per unit turnover, with the public artifact pack using a
+modeled as one-way cost per unit turnover, with the repo using a
 default assumption of 5 basis points. Turnover is measured directly from changes
 in exposure from one day to the next. This means that more active signals are
 penalized appropriately, and any apparently attractive sleeve has to survive not
@@ -264,7 +264,7 @@ the CV line.
 So the honest interpretation of the project is the following. The public repo
 demonstrates the mechanics: signal construction, no-lookahead backtesting,
 validation-only selection, cost modeling, sensitivity analysis, regime
-diagnostics, and artifact generation. The original private-run summary is what
+diagnostics, and report generation. The original private-run summary is what
 supports the stronger headline performance claim. The repository is careful not
 to blur those two things together.
 
@@ -281,7 +281,7 @@ would have been. It tells us that naming a signal differently is not the same as
 having a genuinely distinct source of behavior.
 
 The project also demonstrates that validation and holdout discipline are not
-minor implementation details. An earlier version of the artifact generation path
+minor implementation details. An earlier version of the report generation path
 had holdout leakage in the selection logic. That was removed, and the final
 public ensemble is now selected with a validation-only score. This is one of the
 most important research decisions in the whole repo, because it reinforces the
@@ -296,7 +296,7 @@ Daily close-to-close execution is idealized. Transaction costs are simplified.
 And the stronger original challenge result is still documented as a preserved
 summary rather than a fully reproducible raw historical backtest. None of these
 limitations destroy the value of the project, but they do define the right
-interpretation. This is a research framework and documented research artifact,
+interpretation. This is a research framework and documented research record,
 not a production trading system.
 
 \section*{Conclusion}
@@ -305,9 +305,9 @@ The QQQ project is best understood as a serious systematic research pipeline for
 timing exposure to a single highly liquid ETF using a diversified set of simple
 signals. Its real strength is methodological clarity: interpretable sleeves,
 explicit train / validation / holdout structure, no-lookahead mechanics,
-transaction-cost accounting, public artifacts, and honest retention of
+transaction-cost accounting, committed results, and honest retention of
 unflattering public-sample results. That is precisely why it works well as a
-public-facing project. It does not ask the reviewer to take the process on
+public-facing project. It does not ask the reader to take the process on
 faith. It shows the process directly, and then clearly distinguishes that public
 framework from the stronger private-run result that originally motivated it.
 
