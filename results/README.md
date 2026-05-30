@@ -1,14 +1,13 @@
 # Results
 
-This folder holds the public result tables generated from the committed sample
-dataset.
+This folder holds the result tables generated from the included dataset.
 
 Main files:
 
 - `final_performance_summary.csv`: the benchmark, representative sleeves, and
   final ensemble comparison
-- `model_selection_summary.csv`: validation-only ranking and final public
-  ensemble membership
+- `model_selection_summary.csv`: validation-only ranking and final ensemble
+  membership
 - `signal_family_results.csv`: family-level representative table
 - `cost_sensitivity.csv`: holdout performance under different one-way cost
   assumptions
@@ -16,7 +15,7 @@ Main files:
   sleeves
 - `regime_summary.csv`: structural and event-window regime breakdowns
 - `public_data_split.csv`: exact train / validation / holdout dates used for
-  the public sample
+  the included dataset
 
 The folder also keeps summary files for the original private challenge run:
 
@@ -24,7 +23,7 @@ The folder also keeps summary files for the original private challenge run:
 - `original_challenge_signal_family_results.csv`
 - `original_challenge_cost_sensitivity.csv`
 
-Regenerate the public tables with:
+Regenerate these tables with:
 
 ```bash
 python -m src.build_reports

@@ -14,7 +14,7 @@ smaller dataset with the same basic schema. The research came first and the
 GitHub repo was assembled later from my private research archive, which is why
 some supporting files have newer commit dates than the project itself.
 
-## What The Project Does
+## The Idea
 
 Each day the project chooses a target QQQ exposure in the range `[-1.0, 1.5]`.
 That means the strategy can be short, flat, long, or slightly leveraged long.
@@ -29,7 +29,7 @@ The rules are deliberately simple. They are based on things like:
 The point was not to build a black-box model. The point was to see whether a
 small set of understandable signals could survive a careful research process.
 
-## How It Works
+## How I Tested It
 
 The workflow is:
 
@@ -61,7 +61,7 @@ The current signal set includes:
 | `dual_trend_macro` | combine QQQ trend with DXY trend |
 | `turn_of_month` | add exposure around month-end and the start of the next month |
 
-## The Original Submission And The Included Dataset
+## Data And Split
 
 The original submission used a longer QQQ history provided through the Quanta
 challenge. I cannot redistribute that source data here.
@@ -82,13 +82,8 @@ The original challenge protocol was:
 | Validation | 2016-01-01 to 2021-12-31 | choose signals and build the ensemble |
 | Blind holdout | 2022-01-01 to 2025-06-30 | final evaluation |
 
-So this repo should be read in two layers:
-
-- it contains the full code path for the project
-- it documents the original finalist result separately from the included
-  runnable dataset
-
-The original-result notes are here:
+I kept the repo runnable by including a smaller dataset with the same basic
+schema, and I kept the original challenge notes separately:
 
 - [reports/original_challenge_summary.md](reports/original_challenge_summary.md)
 - [reports/original_challenge_evidence/README.md](reports/original_challenge_evidence/README.md)
@@ -111,7 +106,7 @@ The ranking details are in:
 - [results/signal_family_results.csv](results/signal_family_results.csv)
 - [reports/research_decisions.md](reports/research_decisions.md)
 
-## Results On The Included Dataset
+## Results
 
 Here are the main 5 bps one-way cost results from the included dataset:
 
@@ -138,7 +133,7 @@ Useful result files:
 - [figures/final_drawdown.png](figures/final_drawdown.png)
 - [figures/rolling_sharpe.png](figures/rolling_sharpe.png)
 
-## Data
+## Input Format
 
 The minimum input schema is:
 
@@ -165,15 +160,9 @@ pytest
 
 The defaults point to the included dataset, so the commands work as written.
 
-## What This Repo Is Good For
+The main thing I would want someone to take from the repo is that the process
+is explicit. The rules are simple, the exposure is applied one day later, the
+ensemble is chosen on validation rather than holdout, and the weaker included
+holdout result is still shown plainly.
 
-This repo is best read as a clean record of the research process:
-
-- simple signal design
-- no-lookahead backtesting
-- validation and holdout separation
-- explicit transaction costs
-- honest reporting when the included dataset is weaker than the original
-  challenge result
-
-It is a research project, not a production trading system.
+This is a research project, not a production trading system.
