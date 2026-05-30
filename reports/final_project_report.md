@@ -1,111 +1,65 @@
 # QQQ Signal Research Report
 
-I built this project to study a narrow but practical question: can a small set
-of interpretable QQQ timing rules improve the risk profile of holding Nasdaq
-exposure, or do they disappear once the backtest is run with proper timing,
-costs, and a real validation split?
+This project studies a simple question: can a small set of clear QQQ timing
+rules improve on buy-and-hold once the backtest is run carefully?
 
-The repository contains the runnable version of that workflow. The original
-finalist submission used QQQ data provided through the Quanta QR Fellowship
-challenge, and I cannot redistribute that source dataset here. The committed
-output files are therefore generated from an included repo dataset covering
-`2018-01-02` through `2025-06-30`. That included dataset is long enough to
-show how the pipeline works, how the signal sleeves interact, and how the
-validation logic behaves.
+The repo is the runnable version of that work. The original finalist submission
+used challenge-provided QQQ data that I cannot post here, so the repo uses a
+smaller included dataset with the same kind of inputs. That dataset is enough
+to run the whole pipeline and show how the project works.
 
-I assembled this GitHub repo later from my private research archive, which is
-why some summary files and evidence notes have more recent commit dates than
-the original project itself.
+The setup is straightforward. Each signal maps daily market information into a
+target QQQ exposure between `-1.0` and `1.5`. The signals are built from QQQ
+price behavior, range-based volatility, and DXY. The goal was to keep the
+rules interpretable rather than hide everything inside a large model.
 
-The core design of the project is simple. Each sleeve maps daily market
-information into a target QQQ exposure between `-1.0` and `1.5`. The data is
-minimal by design: QQQ close/high/low plus DXY. From that input, the code
-builds trend, volatility, oversold, macro, and seasonality signals rather than
-fitting a large black-box feature model.
+The signals cover a few main ideas:
 
-The signal set includes:
+- trend
+- oversold mean reversion
+- defensive volatility control
+- cross-asset confirmation
+- seasonality
 
-- long-term trend
-- medium-term trend
-- volatility / oversold mean reversion
-- defensive volatility overlays
-- shock and skew risk controls
-- cross-asset confirmation through DXY
-- month-turn seasonality
+The backtest applies today's chosen exposure to tomorrow's return and charges
+transaction costs when exposure changes. That one-day shift is a key part of
+the design because it avoids a common look-ahead mistake.
 
-Every sleeve produces a daily target exposure. That exposure is applied to the
-next day's QQQ return, not the same day's return. This shifted-exposure rule is
-one of the most important integrity choices in the repo because it keeps the
-signal path from accidentally using same-day information twice. Turnover is
-tracked directly, and one-way transaction costs are charged against exposure
-changes.
-
-The original project was designed around a long train / validation /
-blind-holdout split:
+The original submission used a long train / validation / blind-holdout split:
 
 | Split | Dates | Purpose |
 |---|---:|---|
-| Train | 2000-01-01 to 2015-12-31 | Develop and discard hypotheses |
-| Validation | 2016-01-01 to 2021-12-31 | Choose sleeves and form the ensemble |
-| Blind holdout | 2022-01-01 to 2025-06-30 | Final out-of-sample evaluation |
+| Train | 2000-01-01 to 2015-12-31 | develop and discard ideas |
+| Validation | 2016-01-01 to 2021-12-31 | choose signals and build the ensemble |
+| Blind holdout | 2022-01-01 to 2025-06-30 | final evaluation |
 
-Because the committed included dataset is shorter, the repo uses:
+The included dataset is shorter, so the repo uses:
 
-| Repo split | Dates | Purpose |
+| Split | Dates | Purpose |
 |---|---:|---|
-| Train | 2018-01-01 to 2020-12-31 | First-pass signal work |
-| Validation | 2021-01-01 to 2022-12-31 | Sleeve selection on the included dataset |
-| Holdout | 2023-01-01 to 2025-06-30 | Final included-dataset evaluation |
+| Train | 2018-01-01 to 2020-12-31 | first-pass work |
+| Validation | 2021-01-01 to 2022-12-31 | choose signals on the included dataset |
+| Holdout | 2023-01-01 to 2025-06-30 | final out-of-sample check |
 
-The selection step is validation-only. Signals are first grouped by family and
-ranked using validation Sharpe, validation drawdown, turnover, and cost drag.
-Near-duplicate validation profiles are then removed so the final ensemble does
-not quietly become several versions of the same exposure path. On the committed
-included sample, the final ensemble consists of:
+The final ensemble on the included dataset is:
 
 - `medium_term_trend`
 - `rsi_deep_value`
 - `turn_of_month`
 
-That selection logic matters because it is where many timing projects cheat.
-This repo keeps the holdout period for reporting, not for iterative membership
-changes.
+That selection is validation-only. The holdout period is reported after the
+membership is fixed.
 
-The included-dataset results are intentionally mixed. The final ensemble
-improves holdout drawdown relative to buy-and-hold, but its holdout Sharpe is
-still negative. That is not the most flattering output, but it is the right one
-to leave in the repo. The point of the project is not to prove that every
-included dataset says the strategy is great. The point is to show the full process:
-how sleeves are built, how they are selected, how costs matter, and what
-happens when the included repo dataset does not reproduce the private-run
-headline.
+The included-dataset results are mixed. The final ensemble improves drawdown
+relative to buy-and-hold, but its holdout Sharpe is still negative. I left that
+result in the repo because it is more informative than pretending the included
+dataset reproduced the stronger original submission.
 
-At the same time, the repo does document the original challenge result
-separately. The preserved summary states that the original finalist submission
-reported net blind-holdout Sharpe above `1.3` after costs over
-`2022-01-01` to `2025-06-30`. That result is summarized in
-[reports/original_challenge_summary.md](original_challenge_summary.md) and the
-supporting CSV summaries in `results/`, but it is not falsely presented as a
-recreated backtest from the included repo dataset.
+So the clean way to read the project is:
 
-So the cleanest way to read the project is:
+- the repo shows the full research process
+- the included dataset gives a runnable version of the workflow
+- the original challenge summary records the stronger finalist result
 
-- the repo proves the workflow, code path, and research discipline
-- the included repo dataset gives an honest, runnable signal-comparison benchmark
-- the original challenge summary records the stronger private-run result that
- motivated the project in the first place
-
-The committed deliverables are therefore not just code. They are the code plus
-the decisions around it:
-
-- signal implementations in `src/`
-- a cost-aware no-lookahead backtest
-- selection and ensemble logic
-- CSV summaries for performance, cost sensitivity, parameter sensitivity, and
- regimes
-- figure outputs for equity, drawdown, rolling Sharpe, and correlation
-- a project notebook and supporting notes
-
-That combination is what I wanted the repository to show: not “here is one
-backtest number,” but “here is the full research loop I used to build, test,
-select, and document the strategy.”
+That original result is documented separately in
+[original_challenge_summary.md](original_challenge_summary.md).
