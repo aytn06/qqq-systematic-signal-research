@@ -1,6 +1,6 @@
 # One-Page Project Summary: QQQ Systematic Signal Research
 
-Note: This one-page summary describes the original challenge protocol. The public repository also includes a smaller sanitized sample dataset for reproducibility of the code mechanics. Public sample-data results are not intended to match the original private challenge results.
+Note: This one-page summary describes the original challenge protocol. The repository also includes a smaller sanitized sample dataset for reproducibility of the code mechanics. Included sample-data results are not intended to match the original private challenge results.
 
 ## Objective
 
@@ -8,7 +8,7 @@ Build and validate a systematic QQQ allocation strategy using prespecified signa
 
 ## Data
 
-Daily QQQ close/high/low data plus cross-asset features such as DXY. The public repo includes only a sanitized sample dataset for reproducibility. Actual research data should be stored locally and documented in `data/README.md`.
+Daily QQQ close/high/low data plus cross-asset features such as DXY. The repo includes only a sanitized sample dataset for reproducibility. Actual research data should be stored locally and documented in `data/README.md`.
 
 ## Method
 

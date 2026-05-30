@@ -74,12 +74,12 @@ The original analysis included:
 
 ## Public Repository vs. Original Challenge
 
-The public repository has two purposes:
+The repository has two purposes:
 
 1. Provide a clean, reproducible implementation of the research framework.
 2. Document the original challenge methodology and result summaries without redistributing private data.
 
-Therefore, public sample-data results should not be interpreted as the original challenge performance. The sample data exists only to verify that the code runs end-to-end.
+Therefore, included sample-data results should not be interpreted as the original challenge performance. The sample data exists only to verify that the code runs end-to-end.
 
 Supporting summary files:
 

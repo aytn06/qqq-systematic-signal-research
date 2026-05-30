@@ -1,7 +1,7 @@
 PYTHON ?= python3
 VENV ?= .venv
 
-.PHONY: setup test backtest plots artifacts
+.PHONY: setup test backtest plots reports
 
 setup:
 	$(PYTHON) -m venv $(VENV)
@@ -17,5 +17,5 @@ backtest:
 plots:
 	$(PYTHON) -m src.make_plots
 
-artifacts:
-	$(PYTHON) -m src.generate_research_artifacts
+reports:
+	$(PYTHON) -m src.build_reports

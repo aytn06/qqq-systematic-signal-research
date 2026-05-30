@@ -70,7 +70,7 @@ once one accounts for transaction costs and out-of-sample validation.
 One of the most important things to understand about the repository is that it
 contains both a public, reproducible research framework and a documented summary
 of the original Quanta QR Fellowship finalist submission. These are related, but
-they are not identical. The public repository ships with a sanitized sample
+they are not identical. The repository ships with a sanitized sample
 dataset spanning \texttt{2018-01-02} through \texttt{2025-06-30}. At minimum,
 that dataset contains the columns \texttt{date}, \texttt{qqq\_close},
 \texttt{qqq\_high}, \texttt{qqq\_low}, and \texttt{dxy\_close}. Those columns
@@ -92,7 +92,7 @@ Blind holdout & 2022-01-01 to 2025-06-30 & Final out-of-sample evaluation \\
 \end{tabular}
 \end{center}
 
-Because the public sample begins in 2018, the committed results adapts the
+Because the included sample begins in 2018, the committed results adapts the
 split in a transparent way:
 
 \begin{center}
@@ -108,7 +108,7 @@ Holdout & 2023-01-01 to 2025-06-30 & Final public out-of-sample evaluation \\
 \end{center}
 
 This distinction matters because it explains why the public results are not
-supposed to reproduce the original headline Sharpe. The public sample exists so
+supposed to reproduce the original headline Sharpe. The included sample exists so
 that the mechanics of the project are inspectable. The original challenge
 summary exists so that the stronger private-run result is not erased. The
 repository is explicit about this split because hiding it would make the project
@@ -145,7 +145,7 @@ respected rather than faded.
 The medium-term trend sleeve is more tactical. It uses a shorter exponential
 moving average and allows mild short exposure when QQQ drops below that trend.
 This makes it more responsive and more active than the long-term sleeve, which
-is why it becomes the strongest trend representative on the public sample.
+is why it becomes the strongest trend representative on the included sample.
 
 The volatility and mean-reversion logic is concentrated in \texttt{rsi\_deep\_value}.
 This sleeve is designed around the idea that deeply oversold selloffs should not
@@ -199,7 +199,7 @@ turnover and annualized cost drag. Signals with near-duplicate validation
 profiles are filtered out so that the final ensemble does not simply repeat the
 same behavior under multiple names.
 
-On the committed public sample, that process leaves three sleeves, which can be
+On the committed included sample, that process leaves three sleeves, which can be
 described in plain language as a medium-term trend sleeve, an oversold
 mean-reversion sleeve, and a turn-of-month sleeve. The final public ensemble is
 the clipped combination of those three. This is conceptually useful because it means the final blend
@@ -244,11 +244,11 @@ not produce positive holdout Sharpe. The medium-term trend sleeve is the
 cleanest individual public performer, but even that sleeve has only slightly
 positive holdout Sharpe. The final research ensemble, however, did improve
 drawdown versus buy-and-hold: its holdout max drawdown was materially shallower
-than the passive benchmark. In other words, the public sample suggests that
+than the passive benchmark. In other words, the included sample suggests that
 exposure management helped more on downside control than on outright alpha.
 
 That matters conceptually. A serious research project is allowed to conclude
-that a public sample is not strong enough to support a pretty headline. In fact,
+that a included sample is not strong enough to support a pretty headline. In fact,
 keeping that result in the repo is evidence that the project prioritizes
 research discipline over cosmetic storytelling.
 
@@ -261,7 +261,7 @@ ensemble achieved net blind-holdout Sharpe above \(1.3\) after costs over the
 period from January 1, 2022 through June 30, 2025. That is the result behind
 the CV line.
 
-So the honest interpretation of the project is the following. The public repo
+So the honest interpretation of the project is the following. The repo
 demonstrates the mechanics: signal construction, no-lookahead backtesting,
 validation-only selection, cost modeling, sensitivity analysis, regime
 diagnostics, and report generation. The original private-run summary is what
@@ -270,7 +270,7 @@ to blur those two things together.
 
 \section*{What the Project Lets Us Infer}
 
-The strongest inference is not that the public sample proves a durable edge. The
+The strongest inference is not that the included sample proves a durable edge. The
 strongest inference is that a disciplined timing research process can be built
 around simple and interpretable sleeves, and that drawdown-aware exposure
 management can be meaningfully separated from pure buy-and-hold behavior. The
@@ -289,7 +289,7 @@ principle that out-of-sample results should be reported, not optimized.
 
 \section*{Limitations}
 
-The public repository is careful about its own limits. The public data is
+The repository is careful about its own limits. The public data is
 sanitized and shorter than the intended full-history design. DXY and
 cross-asset behavior are only as realistic as the committed sample permits.
 Daily close-to-close execution is idealized. Transaction costs are simplified.
@@ -307,7 +307,7 @@ signals. Its real strength is methodological clarity: interpretable sleeves,
 explicit train / validation / holdout structure, no-lookahead mechanics,
 transaction-cost accounting, committed results, and honest retention of
 unflattering public-sample results. That is precisely why it works well as a
-public-facing project. It does not ask the reader to take the process on
+ project. It does not ask the reader to take the process on
 faith. It shows the process directly, and then clearly distinguishes that public
 framework from the stronger private-run result that originally motivated it.
 

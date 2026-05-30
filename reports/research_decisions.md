@@ -11,7 +11,7 @@ The original challenge used a longer private dataset. This repo ships with a
 sanitized sample covering `2018-01-02` through `2025-06-30` so the code can run
 publicly. That split forced the project into two layers:
 
-- a runnable public pipeline generated from the committed sample
+- a runnable runnable pipeline generated from the committed sample
 - a separate summary of the original finalist result on the private dataset
 
 That is why the repo keeps both the public result tables in `results/` and the
@@ -26,7 +26,7 @@ to defend because the exposure path does not reuse same-day information.
 ## Family Diversity Mattered More Than Raw Signal Count
 
 Several sleeves had different names but very similar validation behavior. On the
-public sample, the main example was the cluster around:
+included sample, the main example was the cluster around:
 
 - `conservative_fade`
 - `rsi_gated_short`

@@ -62,7 +62,7 @@ def ensure_matplotlib_cache_dir() -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     return argparse.ArgumentParser(
-        description="Generate the committed result tables and figures for the QQQ signal project.",
+        description="Build the committed result tables and figures for the QQQ signal project.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 

@@ -14,14 +14,14 @@ redistributing the original private challenge data.
 ## What I Built
 
 - a daily QQQ exposure-allocation pipeline with long, flat, and modest short
-  states
+ states
 - signal sleeves across trend, volatility, oversold mean reversion, cross-asset
-  confirmation, and seasonality
+ confirmation, and seasonality
 - a backtest path that shifts exposures by one day and charges turnover costs
 - validation-only model selection for the final committed ensemble
 - committed CSV and figure outputs so the project can be inspected without
-  rerunning everything
-- lightweight tests and CI for the public workflow
+ rerunning everything
+- lightweight tests and CI for the repo workflow
 
 ## Main Question
 
@@ -41,14 +41,14 @@ The daily workflow is straightforward:
 
 1. Load QQQ price and range data plus DXY from the input panel.
 2. Compute interpretable features such as moving averages, RSI, Parkinson
-   volatility, ATR-style shocks, rolling skew, and month-turn indicators.
+  volatility, ATR-style shocks, rolling skew, and month-turn indicators.
 3. Map those features into target QQQ exposures in the bounded range
-   `[-1.0, 1.5]`.
+  `[-1.0, 1.5]`.
 4. Apply the chosen exposure to the next day's QQQ return rather than the same
-   day's return.
+  day's return.
 5. Charge one-way transaction costs based on absolute exposure changes.
 6. Compare signals on validation, build a final ensemble from the surviving
-   sleeves, and report holdout performance only after membership is fixed.
+  sleeves, and report holdout performance only after membership is fixed.
 
 The important design choice is that every signal is interpretable. There is no
 black-box optimizer hiding behind the scenes. Each sleeve is a direct mapping
@@ -76,8 +76,8 @@ exposure paths rather than comparing vague "ideas."
 ## Original Project And Included Dataset
 
 The original finalist project used a longer private QQQ history. This repo
-keeps the full code path runnable with a sanitized dataset instead of pretending
-that incomplete public inputs are the original challenge data.
+keeps the full code path runnable with a sanitized dataset instead of treating a
+partial substitute as if it were the original challenge data.
 
 The original private-run protocol was:
 
@@ -98,7 +98,7 @@ The committed dataset is shorter, so the repo uses:
 The repo should therefore be read as:
 
 - a fully runnable research implementation
-- an honest public sample of the workflow
+- an included sample run of the workflow
 - not a claim that the sanitized dataset recreates the original finalist Sharpe
 
 The original challenge summary is documented separately in:
@@ -110,20 +110,20 @@ The original challenge summary is documented separately in:
 ## How I Chose The Final Ensemble
 
 I did not pick the final ensemble by eyeballing holdout Sharpe. The
-selection path in [src/generate_research_artifacts.py](src/generate_research_artifacts.py)
+selection path in [src/build_reports.py](src/build_reports.py)
 uses validation-only information.
 
 The selection logic is:
 
 1. group signals by family
 2. rank each family representative using validation Sharpe, validation max
-   drawdown, turnover, and cost drag
+  drawdown, turnover, and cost drag
 3. remove near-duplicate validation profiles so the final basket is not just
-   several versions of the same exposure path
-4. average the surviving sleeves and clip the final ensemble to the allowed
-   exposure range
+  several versions of the same exposure path
+4. average the selected sleeves and clip the final ensemble to the allowed
+  exposure range
 
-On the committed public sample, the final ensemble contains:
+On the committed included sample, the final ensemble contains:
 
 - `medium_term_trend`
 - `rsi_deep_value`
@@ -137,7 +137,7 @@ The detailed ranking lives in:
 
 ## Results On The Included Dataset
 
-The table below comes from the committed public sample and the default 5 bps
+The table below comes from the committed included sample and the default 5 bps
 one-way turnover cost assumption.
 
 | Strategy | Validation Sharpe | Holdout Sharpe | Holdout Max DD | Holdout Ann Vol | Holdout Turnover | Cost |
@@ -153,7 +153,7 @@ The included dataset tells a mixed but useful story:
 - the final ensemble reduces holdout drawdown relative to buy-and-hold
 - the holdout Sharpe is still negative
 - the medium-term trend sleeve is the cleanest standalone result on the
-  committed sample
+ committed sample
 
 I kept that negative holdout in the repo on purpose. The project is more
 credible with a real tradeoff than it would be with a cleaned-up story that
@@ -201,7 +201,7 @@ Then run the baseline workflow:
 ```bash
 python -m src.run_backtest
 python -m src.make_plots
-python -m src.generate_research_artifacts
+python -m src.build_reports
 pytest
 ```
 
@@ -219,13 +219,13 @@ qqq-plots
 
 ```text
 .
-├── data/                  # Committed dataset and input schema notes
-├── figures/               # Committed plots from the included dataset run
-├── notebooks/             # Walkthrough notebook
-├── reports/               # Project summaries and supporting notes
-├── results/               # Final tables generated from the included dataset
-├── src/                   # Signal, backtest, metrics, and report-generation code
-├── tests/                 # Unit and pipeline smoke tests
+├── data/         # Committed dataset and input schema notes
+├── figures/        # Committed plots from the included dataset run
+├── notebooks/       # Walkthrough notebook
+├── reports/        # Project summaries and supporting notes
+├── results/        # Final tables generated from the included dataset
+├── src/          # Signal, backtest, metrics, and report-generation code
+├── tests/         # Unit and pipeline smoke tests
 ├── CONTRIBUTING.md
 ├── Makefile
 ├── pyproject.toml
@@ -236,7 +236,7 @@ qqq-plots
 
 This repo is most useful as evidence of how I approached the problem:
 
-- define a small, interpretable signal zoo
+- define a small, interpretable signal set
 - backtest with shifted exposures and explicit costs
 - separate validation from holdout
 - document what survived and what did not

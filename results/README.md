@@ -27,5 +27,5 @@ The folder also keeps summary files for the original private challenge run:
 Regenerate the public tables with:
 
 ```bash
-python -m src.generate_research_artifacts
+python -m src.build_reports
 ```

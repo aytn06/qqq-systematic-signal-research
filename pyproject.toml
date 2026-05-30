@@ -25,7 +25,7 @@ Repository = "https://github.com/aytn06/qqq-systematic-signal-research"
 [project.scripts]
 qqq-backtest = "src.run_backtest:main"
 qqq-plots = "src.make_plots:main"
-qqq-artifacts = "src.generate_research_artifacts:main"
+qqq-reports = "src.build_reports:main"
 
 [tool.setuptools]
 packages = ["src"]

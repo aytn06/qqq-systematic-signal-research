@@ -5,10 +5,10 @@ of interpretable QQQ timing rules improve the risk profile of holding Nasdaq
 exposure, or do they disappear once the backtest is run with proper timing,
 costs, and a real validation split?
 
-The public repository contains the runnable version of that workflow. It does
+The repository contains the runnable version of that workflow. It does
 not ship the original private challenge dataset, so the committed output files
-are generated from a sanitized public sample covering `2018-01-02` through
-`2025-06-30`. That public sample is long enough to show how the pipeline works,
+are generated from a sanitized included sample covering `2018-01-02` through
+`2025-06-30`. That included sample is long enough to show how the pipeline works,
 how the signal sleeves interact, and how the validation logic behaves, even
 though it is not a full reproduction of the private-run finalist result.
 
@@ -44,19 +44,19 @@ blind-holdout split:
 | Validation | 2016-01-01 to 2021-12-31 | Choose sleeves and form the ensemble |
 | Blind holdout | 2022-01-01 to 2025-06-30 | Final out-of-sample evaluation |
 
-Because the committed public sample is shorter, the public repo uses:
+Because the committed included sample is shorter, the repo uses:
 
 | Public split | Dates | Purpose |
 |---|---:|---|
 | Train | 2018-01-01 to 2020-12-31 | First-pass signal work |
-| Validation | 2021-01-01 to 2022-12-31 | Sleeve selection on the public sample |
+| Validation | 2021-01-01 to 2022-12-31 | Sleeve selection on the included sample |
 | Holdout | 2023-01-01 to 2025-06-30 | Final public-sample evaluation |
 
 The selection step is validation-only. Signals are first grouped by family and
 ranked using validation Sharpe, validation drawdown, turnover, and cost drag.
 Near-duplicate validation profiles are then removed so the final ensemble does
 not quietly become several versions of the same exposure path. On the committed
-public sample, the final ensemble consists of:
+included sample, the final ensemble consists of:
 
 - `medium_term_trend`
 - `rsi_deep_value`
@@ -70,7 +70,7 @@ The public-sample results are intentionally mixed. The final public ensemble
 improves holdout drawdown relative to buy-and-hold, but its holdout Sharpe is
 still negative. That is not the most flattering output, but it is the right one
 to leave in the repo. The point of the project is not to prove that every
-public sample says the strategy is great. The point is to show the full process:
+included sample says the strategy is great. The point is to show the full process:
 how sleeves are built, how they are selected, how costs matter, and what
 happens when a sanitized sample does not reproduce the private-run headline.
 
@@ -84,10 +84,10 @@ publicly reproduced backtest from the sanitized sample.
 
 So the cleanest way to read the project is:
 
-- the public repo proves the workflow, code path, and research discipline
-- the public sample gives an honest, runnable signal-comparison benchmark
+- the repo proves the workflow, code path, and research discipline
+- the included sample gives an honest, runnable signal-comparison benchmark
 - the original challenge summary records the stronger private-run result that
-  motivated the project in the first place
+ motivated the project in the first place
 
 The committed deliverables are therefore not just code. They are the code plus
 the decisions around it:
@@ -96,7 +96,7 @@ the decisions around it:
 - a cost-aware no-lookahead backtest
 - selection and ensemble logic
 - CSV summaries for performance, cost sensitivity, parameter sensitivity, and
-  regimes
+ regimes
 - figure outputs for equity, drawdown, rolling Sharpe, and correlation
 - a project notebook and supporting notes
 
