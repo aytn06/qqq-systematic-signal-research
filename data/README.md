@@ -1,7 +1,7 @@
 # Data
 
-This repo ships with one sanitized public file, `sample_prices.csv`, so the QQQ
-pipeline can run end to end without any private market data.
+This repo ships with one included file, `sample_prices.csv`, so the QQQ
+pipeline can run end to end without reposting challenge-provided market data.
 
 The minimum schema is:
 
@@ -15,9 +15,15 @@ Optional future columns:
 qqq_volume,spy_close,vix_close,tlt_close,rates_10y
 ```
 
-The committed sample is not the original Quanta challenge dataset. It exists so
-the signal code, backtest, plots, and summary-generation scripts can be run
-publicly.
+The committed sample is not the original Quanta challenge dataset. The original
+finalist submission used data provided through the Quanta QR Fellowship
+challenge, and that source dataset is not redistributable here. This included
+file exists so the signal code, backtest, plots, and summary-generation
+scripts can still run end to end in the repo.
+
+I imported this repo dataset and the supporting summaries later from my private
+research archive, which is why some git timestamps are newer than the original
+project dates.
 
 If you swap in your own research data locally, keep the same column names and
 date structure.

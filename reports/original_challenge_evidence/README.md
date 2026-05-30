@@ -3,7 +3,13 @@
 This folder is reserved for supporting evidence from the original Quanta QR
 Fellowship finalist submission.
 
-The public repository does not redistribute the original private dataset, so the goal here is not to recreate the private run from raw inputs. Instead, this folder provides a place to preserve any surviving evidence that supports the documented original result summary.
+The original submission used data provided through the Quanta QR Fellowship
+challenge, so the goal here is not to repost raw inputs. This folder exists to
+preserve any surviving evidence that supports the documented original result
+summary.
+
+These notes were imported later from my private research archive, which is why
+their git dates may be newer than the original project dates.
 
 Recommended files to place here if they are recovered:
 
@@ -26,7 +32,7 @@ Guidelines:
 - Do not commit proprietary raw market data.
 - Redact personal email addresses or irrelevant private information before committing screenshots or PDFs.
 - Prefer lightweight summary files over full environment dumps.
-- If exact metrics remain unavailable, keep the public repo language at the level of a preserved summary statistic.
+- If exact metrics remain unavailable, keep the repo language at the level of a preserved summary statistic.
 
 Current status:
 

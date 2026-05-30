@@ -8,8 +8,9 @@ interpretable signals and get a cleaner risk/reward profile than buy-and-hold?
 This repo contains the full runnable pipeline behind that work. It includes the
 signal definitions, the no-lookahead backtest, the validation-based selection
 logic, and the scripts that generate the result tables and figures. The
-committed dataset is sanitized so the full pipeline can run end to end without
-redistributing the original private challenge data.
+original finalist submission used challenge-provided QQQ data that cannot be
+redistributed here, so this repo includes a smaller runnable dataset with the
+same schema and the full code path.
 
 ## What I Built
 
@@ -75,9 +76,15 @@ exposure paths rather than comparing vague "ideas."
 
 ## Original Project And Included Dataset
 
-The original finalist project used a longer private QQQ history. This repo
-keeps the full code path runnable with a sanitized dataset instead of treating a
-partial substitute as if it were the original challenge data.
+The original finalist project used a longer QQQ history provided through the
+Quanta QR Fellowship challenge. I cannot post that source dataset here. This
+repo therefore includes a smaller runnable dataset so the pipeline, figures,
+and committed results can still be inspected end to end.
+
+I assembled this GitHub repo later from my private research archive, which is
+why some result summaries, evidence notes, and supporting files appear in newer
+commits than the original project dates. The underlying research came first;
+the repo import happened later.
 
 The original private-run protocol was:
 
@@ -87,19 +94,20 @@ The original private-run protocol was:
 | Validation | 2016-01-01 to 2021-12-31 | Choose sleeves and build the final ensemble |
 | Blind holdout | 2022-01-01 to 2025-06-30 | Final out-of-sample evaluation |
 
-The committed dataset is shorter, so the repo uses:
+The included repo dataset is shorter, so the repo uses:
 
-| Public split | Dates | Purpose |
+| Repo split | Dates | Purpose |
 |---|---:|---|
 | Train | 2018-01-01 to 2020-12-31 | First-pass signal work |
-| Validation | 2021-01-01 to 2022-12-31 | Public-sample model selection |
-| Holdout | 2023-01-01 to 2025-06-30 | Final public-sample evaluation |
+| Validation | 2021-01-01 to 2022-12-31 | Included-dataset model selection |
+| Holdout | 2023-01-01 to 2025-06-30 | Final included-dataset evaluation |
 
 The repo should therefore be read as:
 
-- a fully runnable research implementation
-- an included sample run of the workflow
-- not a claim that the sanitized dataset recreates the original finalist Sharpe
+- the full research code path behind the project
+- a runnable included-dataset version of the workflow
+- a documented summary of the original finalist submission built on the
+  challenge dataset
 
 The original challenge summary is documented separately in:
 
@@ -180,10 +188,11 @@ The pipeline expects at least:
 date,qqq_close,qqq_high,qqq_low,dxy_close
 ```
 
-The committed [data/sample_prices.csv](data/sample_prices.csv) file is a
-sanitized dataset covering `2018-01-02` through `2025-06-30`. It exists so the
-full pipeline can run locally and in CI. It is not the same thing as the
-private full-history dataset used in the original finalist project.
+The committed [data/sample_prices.csv](data/sample_prices.csv) file covers
+`2018-01-02` through `2025-06-30`. It is the included repo dataset I use here
+to keep the full pipeline runnable locally and in CI. The original finalist
+submission used a longer dataset provided through the Quanta QR Fellowship
+challenge, and that source data is not redistributable in this repo.
 
 ## Run The Project
 
@@ -241,6 +250,8 @@ This repo is most useful as evidence of how I approached the problem:
 - separate validation from holdout
 - document what survived and what did not
 
-It does not claim that the included dataset fully proves the private-run
-challenge result. It is meant to show the actual research pipeline behind that
-project in a form that is runnable and inspectable.
+It is meant to show the actual research pipeline behind the project in a form
+that is runnable and inspectable, while keeping the original challenge data
+private. Some summary files were imported later from my private research
+archive, so newer git timestamps should not be confused with the original
+research dates.

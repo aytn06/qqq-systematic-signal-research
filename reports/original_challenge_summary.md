@@ -5,11 +5,17 @@
 This report summarizes the original QQQ signal-research project completed for the Quanta QR Fellowship finalist challenge.
 
 This repository contains the runnable version of the research framework. The
-included dataset is sanitized, but it still shows the mechanics of the
-pipeline: signal construction, no-lookahead backtesting, transaction-cost
-modeling, sensitivity analysis, and regime evaluation.
+included dataset still shows the mechanics of the pipeline: signal
+construction, no-lookahead backtesting, transaction-cost modeling, sensitivity
+analysis, and regime evaluation.
 
-The original challenge used a longer private QQQ dataset. The raw data is not redistributed here, but the research protocol and final result summaries are documented below.
+The original challenge used a longer QQQ dataset provided through the Quanta QR
+Fellowship challenge. That source data is not redistributed here, but the
+research protocol and final result summaries are documented below.
+
+I assembled this GitHub repo later from my private research archive, which is
+why some summary files and evidence notes have newer commit dates than the
+original submission period.
 
 ## Original Research Protocol
 
@@ -49,17 +55,17 @@ The final research process evaluated signals across the following families:
 
 The preserved challenge materials report that the final ensemble achieved net blind-holdout Sharpe above 1.3 after transaction costs over 2022-01-01 to 2025-06-30.
 
-Exact full metric tables from the private challenge run are not redistributed
-here because the original dataset is not public and the preserved materials
+Exact full metric tables from the challenge run are not redistributed here
+because the source dataset is not mine to post and the preserved materials
 retained the headline result rather than the complete raw output. This
 repository therefore documents the original result as a summary statistic, not
-as a fully reproduced private-run backtest table.
+as a recreated raw backtest table.
 
 | Strategy | Validation Sharpe | Blind-Holdout Sharpe | Max Drawdown | Notes |
 |---|---:|---:|---:|---|
 | Buy-and-hold QQQ | NA | NA | NA | Benchmark on the original private dataset |
 | Best single signal | NA | NA | NA | Strongest standalone signal on the original private dataset |
-| Final ensemble | NA | >1.3 | NA | Final selected portfolio; the preserved public materials retained the headline after-cost Sharpe rather than the full raw metric table |
+| Final ensemble | NA | >1.3 | NA | Final selected portfolio; the preserved project materials retained the headline after-cost Sharpe rather than the full raw metric table |
 
 ## Robustness Checks
 
@@ -72,14 +78,18 @@ The original analysis included:
 - Signal-family comparison.
 - Comparison against buy-and-hold QQQ.
 
-## Public Repository vs. Original Challenge
+## How This Repo Relates To The Original Submission
 
 The repository has two purposes:
 
-1. Provide a clean, reproducible implementation of the research framework.
-2. Document the original challenge methodology and result summaries without redistributing private data.
+1. Preserve the full research code path in a runnable repo.
+2. Document the original challenge methodology and result summaries without
+   redistributing challenge-provided data.
 
-Therefore, included sample-data results should not be interpreted as the original challenge performance. The sample data exists only to verify that the code runs end-to-end.
+The included dataset should therefore be read as the runnable repo dataset,
+while the original result summary refers to the actual finalist submission.
+Some evidence files were imported later from my private research archive, which
+explains why their git timestamps are newer than the project dates.
 
 Supporting summary files:
 

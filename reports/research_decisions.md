@@ -1,21 +1,24 @@
 # Project Notes
 
-I kept this note to record the decisions that shaped the public version of the
-QQQ project. The goal is not to present a polished story after the fact. It is
-to keep track of what changed once the backtests, validation results, and
+I kept this note to record the decisions that shaped the committed version of
+the QQQ project. The goal is not to present a polished story after the fact. It
+is to keep track of what changed once the backtests, validation results, and
 report-generation path were inspected more carefully.
 
-## Public Sample And Private Challenge Run
+## Included Dataset And Original Challenge Run
 
-The original challenge used a longer private dataset. This repo ships with a
-sanitized sample covering `2018-01-02` through `2025-06-30` so the code can run
-publicly. That split forced the project into two layers:
+The original finalist submission used a longer dataset provided through the
+Quanta QR Fellowship challenge. This repo ships with an included dataset
+covering `2018-01-02` through `2025-06-30` so the code can run end to end
+without reposting challenge data. That split forced the project into two
+layers:
 
-- a runnable runnable pipeline generated from the committed sample
-- a separate summary of the original finalist result on the private dataset
+- a runnable pipeline generated from the included repo dataset
+- a separate summary of the original finalist result on the challenge dataset
 
-That is why the repo keeps both the public result tables in `results/` and the
-private-run summary in `reports/original_challenge_summary.md`.
+I assembled the GitHub repo later from my private research archive, which is
+why some summaries and supporting notes have newer commit dates than the
+original project itself.
 
 ## Shifted Exposure Became The Default
 
@@ -33,7 +36,7 @@ included sample, the main example was the cluster around:
 - `skew_filter`
 
 Those sleeves moved too much like `rsi_deep_value` to justify all of them
-surviving into the final ensemble. The public version therefore keeps one strong
+surviving into the final ensemble. The committed version therefore keeps one strong
 representative instead of pretending multiple near-duplicates are independent
 ideas.
 
@@ -41,13 +44,13 @@ ideas.
 
 `dual_trend_macro` stayed in the committed outputs because it captures a real
 part of the research question: whether QQQ timing improves when price trend is
-checked against a broad dollar signal. It was not selected into the final public
+checked against a broad dollar signal. It was not selected into the final
 ensemble because its validation ranking lagged the sleeves that survived.
 
 ## Holdout Leakage Was Removed
 
-An earlier report-generation pass let holdout information influence the public
-selection path. The committed version fixes that. The final public ensemble is
+An earlier report-generation pass let holdout information influence the
+selection path. The committed version fixes that. The final ensemble is
 now ranked only on:
 
 - validation Sharpe
@@ -58,9 +61,9 @@ now ranked only on:
 Holdout metrics are still reported, but they are no longer used to choose which
 signals survive.
 
-## The Negative Public Holdout Was Left In Place
+## The Negative Holdout Was Left In Place
 
-The public-sample final ensemble does not have a positive holdout Sharpe. I left
+The included-dataset final ensemble does not have a positive holdout Sharpe. I left
 that result in the repo because the project is supposed to show the research
 process honestly, not quietly swap in a prettier sample after the fact.
 

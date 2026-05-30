@@ -5,12 +5,17 @@ of interpretable QQQ timing rules improve the risk profile of holding Nasdaq
 exposure, or do they disappear once the backtest is run with proper timing,
 costs, and a real validation split?
 
-The repository contains the runnable version of that workflow. It does
-not ship the original private challenge dataset, so the committed output files
-are generated from a sanitized included sample covering `2018-01-02` through
-`2025-06-30`. That included sample is long enough to show how the pipeline works,
-how the signal sleeves interact, and how the validation logic behaves, even
-though it is not a full reproduction of the private-run finalist result.
+The repository contains the runnable version of that workflow. The original
+finalist submission used QQQ data provided through the Quanta QR Fellowship
+challenge, and I cannot redistribute that source dataset here. The committed
+output files are therefore generated from an included repo dataset covering
+`2018-01-02` through `2025-06-30`. That included dataset is long enough to
+show how the pipeline works, how the signal sleeves interact, and how the
+validation logic behaves.
+
+I assembled this GitHub repo later from my private research archive, which is
+why some summary files and evidence notes have more recent commit dates than
+the original project itself.
 
 The core design of the project is simple. Each sleeve maps daily market
 information into a target QQQ exposure between `-1.0` and `1.5`. The data is
@@ -44,13 +49,13 @@ blind-holdout split:
 | Validation | 2016-01-01 to 2021-12-31 | Choose sleeves and form the ensemble |
 | Blind holdout | 2022-01-01 to 2025-06-30 | Final out-of-sample evaluation |
 
-Because the committed included sample is shorter, the repo uses:
+Because the committed included dataset is shorter, the repo uses:
 
-| Public split | Dates | Purpose |
+| Repo split | Dates | Purpose |
 |---|---:|---|
 | Train | 2018-01-01 to 2020-12-31 | First-pass signal work |
-| Validation | 2021-01-01 to 2022-12-31 | Sleeve selection on the included sample |
-| Holdout | 2023-01-01 to 2025-06-30 | Final public-sample evaluation |
+| Validation | 2021-01-01 to 2022-12-31 | Sleeve selection on the included dataset |
+| Holdout | 2023-01-01 to 2025-06-30 | Final included-dataset evaluation |
 
 The selection step is validation-only. Signals are first grouped by family and
 ranked using validation Sharpe, validation drawdown, turnover, and cost drag.
@@ -66,13 +71,14 @@ That selection logic matters because it is where many timing projects cheat.
 This repo keeps the holdout period for reporting, not for iterative membership
 changes.
 
-The public-sample results are intentionally mixed. The final public ensemble
+The included-dataset results are intentionally mixed. The final ensemble
 improves holdout drawdown relative to buy-and-hold, but its holdout Sharpe is
 still negative. That is not the most flattering output, but it is the right one
 to leave in the repo. The point of the project is not to prove that every
-included sample says the strategy is great. The point is to show the full process:
+included dataset says the strategy is great. The point is to show the full process:
 how sleeves are built, how they are selected, how costs matter, and what
-happens when a sanitized sample does not reproduce the private-run headline.
+happens when the included repo dataset does not reproduce the private-run
+headline.
 
 At the same time, the repo does document the original challenge result
 separately. The preserved summary states that the original finalist submission
@@ -80,12 +86,12 @@ reported net blind-holdout Sharpe above `1.3` after costs over
 `2022-01-01` to `2025-06-30`. That result is summarized in
 [reports/original_challenge_summary.md](original_challenge_summary.md) and the
 supporting CSV summaries in `results/`, but it is not falsely presented as a
-publicly reproduced backtest from the sanitized sample.
+recreated backtest from the included repo dataset.
 
 So the cleanest way to read the project is:
 
 - the repo proves the workflow, code path, and research discipline
-- the included sample gives an honest, runnable signal-comparison benchmark
+- the included repo dataset gives an honest, runnable signal-comparison benchmark
 - the original challenge summary records the stronger private-run result that
  motivated the project in the first place
 
