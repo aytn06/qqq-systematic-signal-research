@@ -8,10 +8,16 @@ from pathlib import Path
 import pandas as pd
 
 from .backtest import backtest_many
+from .attribution import (
+    component_contribution_timeseries,
+    exposure_state_summary,
+    summarize_component_attribution,
+)
 from .config import BacktestConfig, infer_backtest_config
 from .data_loader import add_returns, load_price_data
 from .metrics import summarize_by_split
 from .plots import (
+    plot_component_contribution_curves,
     plot_correlation_heatmap,
     plot_cost_sensitivity,
     plot_drawdown_comparison,
@@ -19,6 +25,7 @@ from .plots import (
     plot_parameter_sensitivity_heatmap,
     plot_regime_breakdown,
     plot_rolling_sharpe,
+    plot_walkforward_holdout,
 )
 from .regime import classify_regimes, regime_summary
 from .signals import (
@@ -29,6 +36,7 @@ from .signals import (
     clip_exposure,
 )
 from .validation import sensitivity_analysis
+from .walkforward import evaluate_walkforward_selection
 
 
 DEFAULT_INPUT = "data/sample_prices.csv"
@@ -373,6 +381,39 @@ def main() -> None:
     regime_df = pd.concat(regime_rows, ignore_index=True)
     regime_df.to_csv(results_dir / "regime_summary.csv", index=False)
 
+    contribution_df, component_exposures = component_contribution_timeseries(
+        returns=df["qqq_return"],
+        signals=signals,
+        selected_signals=selected_signals,
+        config=config,
+    )
+    contribution_df.to_csv(results_dir / "ensemble_component_contributions.csv", index_label="date")
+    component_exposures.to_csv(results_dir / "selected_signal_component_exposures.csv", index_label="date")
+    summarize_component_attribution(
+        returns=df["qqq_return"],
+        signals=signals,
+        selected_signals=selected_signals,
+        config=config,
+    ).to_csv(results_dir / "component_attribution_summary.csv", index=False)
+    exposure_state_summary(
+        pd.concat(
+            [
+                signals[selected_signals],
+                final_ensemble.rename("final_research_ensemble"),
+            ],
+            axis=1,
+        )
+    ).to_csv(results_dir / "exposure_state_summary.csv", index=False)
+
+    walkforward_performance, walkforward_selection = evaluate_walkforward_selection(
+        returns=df["qqq_return"],
+        signals=signals,
+        signal_backtests=signal_backtests,
+        config=config,
+    )
+    walkforward_performance.to_csv(results_dir / "walkforward_performance.csv", index=False)
+    walkforward_selection.to_csv(results_dir / "walkforward_selection.csv", index=False)
+
     selected_signal_returns = {
         DISPLAY_NAMES.get(signal, signal): backtests[signal]["net_return"] for signal in selected_signals
     }
@@ -413,6 +454,14 @@ def main() -> None:
         regime_df,
         str(figures_dir / "regime_breakdown.png"),
         strategies=["buy_and_hold", "final_research_ensemble"],
+    )
+    plot_component_contribution_curves(
+        contribution_df,
+        str(figures_dir / "component_contributions.png"),
+    )
+    plot_walkforward_holdout(
+        walkforward_performance,
+        str(figures_dir / "walkforward_selection.png"),
     )
 
     save_public_split(config, results_dir / "public_data_split.csv")

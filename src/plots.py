@@ -156,3 +156,39 @@ def plot_regime_breakdown(
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_path, dpi=150)
     plt.close()
+
+
+def plot_component_contribution_curves(contribution_df: pd.DataFrame, output_path: str) -> None:
+    plt.figure(figsize=(10, 5))
+    for signal in contribution_df.columns:
+        curve = (1 + contribution_df[signal].fillna(0.0)).cumprod()
+        plt.plot(curve.index, curve.values, label=signal)
+    plt.title("Selected Signal Contribution Curves")
+    plt.xlabel("Date")
+    plt.ylabel("Growth of $1")
+    plt.legend()
+    plt.tight_layout()
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(output_path, dpi=150)
+    plt.close()
+
+
+def plot_walkforward_holdout(performance_df: pd.DataFrame, output_path: str) -> None:
+    if performance_df.empty:
+        return
+    plt.figure(figsize=(10, 4.5))
+    folds = performance_df["fold"]
+    x = np.arange(len(folds))
+    width = 0.35
+    plt.bar(x - width / 2, performance_df["validation_sharpe"], width=width, label="Validation Sharpe")
+    plt.bar(x + width / 2, performance_df["holdout_sharpe"], width=width, label="Holdout Sharpe")
+    plt.axhline(0.0, color="black", linewidth=0.8, linestyle="--")
+    plt.xticks(x, folds)
+    plt.ylabel("Sharpe")
+    plt.xlabel("Walk-forward fold")
+    plt.title("Walk-Forward Ensemble Selection")
+    plt.legend()
+    plt.tight_layout()
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(output_path, dpi=150)
+    plt.close()

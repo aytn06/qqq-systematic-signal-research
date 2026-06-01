@@ -14,6 +14,14 @@ Main files:
 - `parameter_sensitivity.csv`: +/- 10% parameter perturbations for the selected
   sleeves
 - `regime_summary.csv`: structural and event-window regime breakdowns
+- `component_attribution_summary.csv`: split-by-split contribution summary for
+  the selected ensemble members
+- `ensemble_component_contributions.csv`: daily net contribution series for the
+  selected ensemble members
+- `exposure_state_summary.csv`: time spent short, flat, long, and levered long
+- `walkforward_performance.csv`: repeated expanding-window selection results
+- `walkforward_selection.csv`: which signals were chosen in each walk-forward
+  fold
 - `public_data_split.csv`: exact train / validation / holdout dates used for
   the included dataset
 

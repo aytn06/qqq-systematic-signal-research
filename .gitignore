@@ -25,6 +25,8 @@ figures/*.png
 !figures/regime_breakdown.png
 !figures/cost_sensitivity.png
 !figures/parameter_sensitivity_heatmap.png
+!figures/component_contributions.png
+!figures/walkforward_selection.png
 results/*.csv
 !results/final_performance_summary.csv
 !results/signal_family_results.csv
@@ -33,6 +35,12 @@ results/*.csv
 !results/regime_summary.csv
 !results/model_selection_summary.csv
 !results/public_data_split.csv
+!results/component_attribution_summary.csv
+!results/ensemble_component_contributions.csv
+!results/exposure_state_summary.csv
+!results/selected_signal_component_exposures.csv
+!results/walkforward_performance.csv
+!results/walkforward_selection.csv
 !results/original_challenge_performance_summary.csv
 !results/original_challenge_signal_family_results.csv
 !results/original_challenge_cost_sensitivity.csv

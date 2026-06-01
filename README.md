@@ -41,6 +41,8 @@ The workflow is:
 5. Charge transaction costs when exposure changes.
 6. Select the final ensemble using validation only, then report holdout
    results.
+7. Re-run the selection idea across multiple expanding walk-forward folds and
+   break the final ensemble into component-level return contributions.
 
 That one-day shift is important. It keeps the backtest from using same-day
 information twice.
@@ -129,9 +131,13 @@ Useful result files:
 - [results/cost_sensitivity.csv](results/cost_sensitivity.csv)
 - [results/parameter_sensitivity.csv](results/parameter_sensitivity.csv)
 - [results/regime_summary.csv](results/regime_summary.csv)
+- [results/walkforward_performance.csv](results/walkforward_performance.csv)
+- [results/component_attribution_summary.csv](results/component_attribution_summary.csv)
 - [figures/final_equity_curve.png](figures/final_equity_curve.png)
 - [figures/final_drawdown.png](figures/final_drawdown.png)
 - [figures/rolling_sharpe.png](figures/rolling_sharpe.png)
+- [figures/walkforward_selection.png](figures/walkforward_selection.png)
+- [figures/component_contributions.png](figures/component_contributions.png)
 
 ## Input Format
 
