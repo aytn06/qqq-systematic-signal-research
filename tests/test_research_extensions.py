@@ -4,6 +4,7 @@ from src.attribution import component_contribution_timeseries, exposure_state_su
 from src.backtest import backtest_many
 from src.config import infer_backtest_config
 from src.data_loader import add_returns, load_price_data
+from src.inference import bootstrap_metric_summary
 from src.signals import build_signal_matrix
 from src.walkforward import build_walkforward_windows, evaluate_walkforward_selection
 
@@ -59,3 +60,11 @@ def test_component_attribution_sums_to_selected_signal_frame():
 
     assert {"signal", "split", "sharpe"}.issubset(summary.columns)
     assert {"series", "short_share", "long_share"}.issubset(states.columns)
+
+
+def test_bootstrap_metric_summary_runs():
+    df = add_returns(load_price_data(str(SAMPLE_DATA)))
+    config = infer_backtest_config(df.index)
+    stats = bootstrap_metric_summary(df.loc[config.holdout_start : config.holdout_end, "qqq_return"], config=config, n_boot=40)
+    assert not stats.empty
+    assert {"metric", "point_estimate", "bootstrap_p10", "probability_positive"}.issubset(stats.columns)

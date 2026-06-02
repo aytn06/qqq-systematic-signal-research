@@ -33,6 +33,7 @@ results/*.csv
 !results/cost_sensitivity.csv
 !results/parameter_sensitivity.csv
 !results/regime_summary.csv
+!results/holdout_bootstrap_summary.csv
 !results/model_selection_summary.csv
 !results/public_data_split.csv
 !results/component_attribution_summary.csv

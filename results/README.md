@@ -14,6 +14,8 @@ Main files:
 - `parameter_sensitivity.csv`: +/- 10% parameter perturbations for the selected
   sleeves
 - `regime_summary.csv`: structural and event-window regime breakdowns
+- `holdout_bootstrap_summary.csv`: moving-block bootstrap ranges for holdout
+  Sharpe, annual return, and drawdown
 - `component_attribution_summary.csv`: split-by-split contribution summary for
   the selected ensemble members
 - `ensemble_component_contributions.csv`: daily net contribution series for the
@@ -22,6 +24,10 @@ Main files:
 - `walkforward_performance.csv`: repeated expanding-window selection results
 - `walkforward_selection.csv`: which signals were chosen in each walk-forward
   fold
+
+The walk-forward files keep the selection strict. If no signal survives the
+validation filters in a fold, the walk-forward portfolio stays flat rather than
+filling the basket with convenience picks.
 - `public_data_split.csv`: exact train / validation / holdout dates used for
   the included dataset
 

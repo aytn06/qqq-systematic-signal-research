@@ -100,19 +100,9 @@ def _select_signals_for_fold(signals: pd.DataFrame, signal_summary: pd.DataFrame
                 "validation_score": row["score"],
                 "validation_sharpe": row["validation_sharpe"],
                 "max_abs_validation_corr_to_selected": max_corr,
+                "selection_reason": "kept" if keep else "rejected",
             }
         )
-
-    if len(selected) < 3:
-        remaining = [
-            signal
-            for signal in candidates.sort_values(["score", "validation_sharpe"], ascending=[False, False])["signal"]
-            if signal not in selected
-        ]
-        for signal in remaining:
-            selected.append(signal)
-            if len(selected) == 3:
-                break
 
     return selected, pd.DataFrame(rows)
 
@@ -141,11 +131,14 @@ def evaluate_walkforward_selection(
         fold_config = _fold_config(config, window)
         fold_summary = summarize_by_split(signal_backtests, config=fold_config, return_col="net_return")
         selected, selection_df = _select_signals_for_fold(signals, fold_summary, fold_config)
-        final_exposure = clip_exposure(
-            signals[selected].mean(axis=1),
-            min_exposure=config.min_exposure,
-            max_exposure=config.max_exposure,
-        )
+        if selected:
+            final_exposure = clip_exposure(
+                signals[selected].mean(axis=1),
+                min_exposure=config.min_exposure,
+                max_exposure=config.max_exposure,
+            )
+        else:
+            final_exposure = pd.Series(0.0, index=signals.index, name="flat_if_no_signal")
         final_bt = compute_strategy_returns(returns, final_exposure, config=fold_config, shift_exposure=True)
         validation_metrics = summarize_backtest(final_bt.loc[fold_config.valid_start : fold_config.valid_end], fold_config)
         holdout_metrics = summarize_backtest(final_bt.loc[fold_config.holdout_start : fold_config.holdout_end], fold_config)
@@ -154,6 +147,7 @@ def evaluate_walkforward_selection(
                 **window,
                 "selected_signals": ", ".join(selected),
                 "n_selected": len(selected),
+                "flat_if_empty": len(selected) == 0,
                 "validation_sharpe": validation_metrics["sharpe"],
                 "holdout_sharpe": holdout_metrics["sharpe"],
                 "holdout_ann_return": holdout_metrics["ann_return"],

@@ -41,8 +41,9 @@ The workflow is:
 5. Charge transaction costs when exposure changes.
 6. Select the final ensemble using validation only, then report holdout
    results.
-7. Re-run the selection idea across multiple expanding walk-forward folds and
-   break the final ensemble into component-level return contributions.
+7. Re-run the selection idea across multiple expanding walk-forward folds,
+   leave the portfolio flat when no signal survives the validation filters,
+   and break the final ensemble into component-level return contributions.
 
 That one-day shift is important. It keeps the backtest from using same-day
 information twice.
@@ -108,6 +109,11 @@ The ranking details are in:
 - [results/signal_family_results.csv](results/signal_family_results.csv)
 - [reports/research_decisions.md](reports/research_decisions.md)
 
+I also kept the repeated walk-forward selection strict. If a fold has no signal
+with positive validation performance after the correlation and duplication
+filters, the walk-forward portfolio stays flat instead of forcing extra sleeves
+into the basket.
+
 ## Results
 
 Here are the main 5 bps one-way cost results from the included dataset:
@@ -125,12 +131,19 @@ ensemble helps drawdown relative to buy-and-hold, but it does not produce a
 positive holdout Sharpe. I left that in the repo because I would rather show
 the actual outcome than smooth it over.
 
+I also added a moving-block bootstrap summary for the holdout period. That file
+does not rescue the result; it makes the uncertainty explicit. The selected
+ensemble has only about a 30% bootstrap probability of positive holdout Sharpe
+on the included dataset, which is exactly the sort of check I would want to see
+if I were reviewing someone else's timing project.
+
 Useful result files:
 
 - [results/final_performance_summary.csv](results/final_performance_summary.csv)
 - [results/cost_sensitivity.csv](results/cost_sensitivity.csv)
 - [results/parameter_sensitivity.csv](results/parameter_sensitivity.csv)
 - [results/regime_summary.csv](results/regime_summary.csv)
+- [results/holdout_bootstrap_summary.csv](results/holdout_bootstrap_summary.csv)
 - [results/walkforward_performance.csv](results/walkforward_performance.csv)
 - [results/component_attribution_summary.csv](results/component_attribution_summary.csv)
 - [figures/final_equity_curve.png](figures/final_equity_curve.png)

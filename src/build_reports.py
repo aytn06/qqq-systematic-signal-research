@@ -15,6 +15,7 @@ from .attribution import (
 )
 from .config import BacktestConfig, infer_backtest_config
 from .data_loader import add_returns, load_price_data
+from .inference import bootstrap_metric_summary
 from .metrics import summarize_by_split
 from .plots import (
     plot_component_contribution_curves,
@@ -185,44 +186,15 @@ def select_validation_signals(
                 "max_abs_validation_corr_to_selected": max_corr,
                 "min_mean_abs_exposure_diff_to_selected": min_abs_diff,
                 "duplicate_validation_profile": duplicate_profile,
+                "positive_validation": positive_validation,
             }
         )
 
     selection = family_best.merge(pd.DataFrame(selection_rows), on=["signal", "family"], how="left")
 
-    if len(selected) < 3:
-        remaining = [
-            signal
-            for signal in candidates.sort_values(
-                [
-                    "validation_selection_score",
-                    "validation_sharpe",
-                    "validation_max_drawdown",
-                    "validation_avg_turnover",
-                ],
-                ascending=[False, False, False, True],
-            )["signal"]
-            if signal not in selected
-        ]
-        for signal in remaining:
-            min_abs_diff = min(
-                (
-                    (validation_slice[signal] - validation_slice[chosen]).abs().mean()
-                    for chosen in selected
-                ),
-                default=1.0,
-            )
-            if pd.notna(min_abs_diff) and min_abs_diff < 0.05:
-                continue
-            selected.append(signal)
-            if len(selected) == 3:
-                break
-        selection["selected_for_final_ensemble"] = selection["signal"].isin(selected)
-        selection.loc[selection["selected_for_final_ensemble"], "selection_order"] = [
-            selected.index(signal) + 1 for signal in selection.loc[selection["selected_for_final_ensemble"], "signal"]
-        ]
-
     selection["display_name"] = selection["signal"].map(DISPLAY_NAMES)
+    selection["selection_policy"] = "keep only positive-validation, non-duplicate, low-correlation representatives"
+    selection["flat_ensemble_if_empty"] = len(selected) == 0
     return selected, selection.sort_values(
         ["selected_for_final_ensemble", "validation_selection_score", "validation_sharpe"],
         ascending=[False, False, False],
@@ -281,11 +253,14 @@ def main() -> None:
 
     buy_and_hold = pd.Series(1.0, index=df.index, name="buy_and_hold")
     equal_weight = clip_exposure(signals.mean(axis=1), min_exposure=config.min_exposure, max_exposure=config.max_exposure).rename("equal_weight_ensemble")
-    final_ensemble = clip_exposure(
-        signals[selected_signals].mean(axis=1),
-        min_exposure=config.min_exposure,
-        max_exposure=config.max_exposure,
-    ).rename("final_research_ensemble")
+    if selected_signals:
+        final_ensemble = clip_exposure(
+            signals[selected_signals].mean(axis=1),
+            min_exposure=config.min_exposure,
+            max_exposure=config.max_exposure,
+        ).rename("final_research_ensemble")
+    else:
+        final_ensemble = pd.Series(0.0, index=df.index, name="final_research_ensemble")
 
     exposures = pd.concat([buy_and_hold, signals, equal_weight, final_ensemble], axis=1)
     backtests = backtest_many(df["qqq_return"], exposures, config=config, shift_exposure=True)
@@ -364,8 +339,21 @@ def main() -> None:
                 pct=0.10,
             ).assign(family=SIGNAL_FAMILY_MAP[signal], display_name=DISPLAY_NAMES.get(signal, signal))
         )
-    sensitivity_df = pd.concat(sensitivity_frames, ignore_index=True)
+    sensitivity_df = pd.concat(sensitivity_frames, ignore_index=True) if sensitivity_frames else pd.DataFrame()
     sensitivity_df.to_csv(results_dir / "parameter_sensitivity.csv", index=False)
+
+    bootstrap_rows = []
+    for strategy in ["buy_and_hold", *selected_signals, "final_research_ensemble"]:
+        bt = backtests[strategy].loc[config.holdout_start : config.holdout_end]
+        stats = bootstrap_metric_summary(bt["net_return"], config=config, block_size=20, n_boot=400, seed=7)
+        if stats.empty:
+            continue
+        stats["strategy"] = strategy
+        stats["display_name"] = DISPLAY_NAMES.get(strategy, strategy)
+        stats["split"] = "holdout"
+        bootstrap_rows.append(stats)
+    bootstrap_df = pd.concat(bootstrap_rows, ignore_index=True) if bootstrap_rows else pd.DataFrame()
+    bootstrap_df.to_csv(results_dir / "holdout_bootstrap_summary.csv", index=False)
 
     regime_rows = []
     regime_sets = structural_and_event_regimes(df)
@@ -440,16 +428,18 @@ def main() -> None:
         str(figures_dir / "rolling_sharpe.png"),
         trading_days=config.trading_days,
     )
-    plot_correlation_heatmap(
-        signals[selected_signals].corr(),
-        str(figures_dir / "signal_correlation_heatmap.png"),
-        title="Selected Signal Correlation",
-    )
+    if selected_signals:
+        plot_correlation_heatmap(
+            signals[selected_signals].corr(),
+            str(figures_dir / "signal_correlation_heatmap.png"),
+            title="Selected Signal Correlation",
+        )
     plot_cost_sensitivity(cost_df, str(figures_dir / "cost_sensitivity.png"))
-    plot_parameter_sensitivity_heatmap(
-        sensitivity_df,
-        str(figures_dir / "parameter_sensitivity_heatmap.png"),
-    )
+    if not sensitivity_df.empty:
+        plot_parameter_sensitivity_heatmap(
+            sensitivity_df,
+            str(figures_dir / "parameter_sensitivity_heatmap.png"),
+        )
     plot_regime_breakdown(
         regime_df,
         str(figures_dir / "regime_breakdown.png"),
