@@ -1,8 +1,8 @@
 # Results
 
-This folder holds the result tables generated from the included dataset.
+This folder has the result tables for the included dataset.
 
-Main files:
+The main files are:
 
 - `final_performance_summary.csv`: the benchmark, representative sleeves, and
   final ensemble comparison
@@ -24,20 +24,20 @@ Main files:
 - `walkforward_performance.csv`: repeated expanding-window selection results
 - `walkforward_selection.csv`: which signals were chosen in each walk-forward
   fold
-
-The walk-forward files keep the selection strict. If no signal survives the
-validation filters in a fold, the walk-forward portfolio stays flat rather than
-filling the basket with convenience picks.
 - `public_data_split.csv`: exact train / validation / holdout dates used for
   the included dataset
 
-The folder also keeps summary files for the original private challenge run:
+The walk-forward files are intentionally strict. If nothing survives the
+validation filters in a fold, the portfolio just stays flat instead of forcing
+extra signals into the mix.
+
+I also kept summary files for the original private challenge run here:
 
 - `original_challenge_performance_summary.csv`
 - `original_challenge_signal_family_results.csv`
 - `original_challenge_cost_sensitivity.csv`
 
-Regenerate these tables with:
+To rebuild these tables:
 
 ```bash
 python -m src.build_reports

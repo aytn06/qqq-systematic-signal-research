@@ -1,12 +1,12 @@
 # QQQ Systematic Signal Research
 
 I built this project during the Quanta QR Fellowship finalist process. The
-question was simple: instead of holding QQQ at a fixed weight all the time, can
-I change exposure day by day with a small set of clear rules and get a better
-risk profile than buy-and-hold?
+basic question was simple: instead of holding QQQ the same way every day, can I
+change exposure with a small set of clear rules and get a better ride than just
+buying and holding it?
 
-That is what this repo does. It contains the signal rules, the backtest, the
-validation logic, the result tables, and the plots.
+That is what this repo does. It has the signal rules, the backtest, the
+selection logic, the result tables, and the plots.
 
 The original finalist submission used QQQ data provided through the challenge,
 so I cannot post that dataset here. To make the project runnable, I included a
@@ -26,8 +26,8 @@ The rules are deliberately simple. They are based on things like:
 - dollar strength through DXY
 - month-end seasonality
 
-The point was not to build a black-box model. The point was to see whether a
-small set of understandable signals could survive a careful research process.
+I was not trying to build a black-box model. I wanted to see whether a small
+set of understandable signals could hold up under a disciplined test.
 
 ## How I Tested It
 
@@ -45,8 +45,8 @@ The workflow is:
    leave the portfolio flat when no signal survives the validation filters,
    and break the final ensemble into component-level return contributions.
 
-That one-day shift is important. It keeps the backtest from using same-day
-information twice.
+That one-day shift matters. It keeps the backtest from double-counting today's
+information.
 
 ## Signals
 
@@ -94,7 +94,7 @@ schema, and I kept the original challenge notes separately:
 
 ## Final Ensemble
 
-I did not choose the final ensemble by looking at holdout Sharpe. The selection
+I did not choose the final ensemble by peeking at holdout Sharpe. The selection
 path uses validation only.
 
 On the included dataset, the final ensemble is:
@@ -111,8 +111,7 @@ The ranking details are in:
 
 I also kept the repeated walk-forward selection strict. If a fold has no signal
 with positive validation performance after the correlation and duplication
-filters, the walk-forward portfolio stays flat instead of forcing extra sleeves
-into the basket.
+filters, I leave the portfolio flat instead of stuffing extra signals into it.
 
 ## Results
 
@@ -126,16 +125,15 @@ Here are the main 5 bps one-way cost results from the included dataset:
 | Dual Trend Macro | -0.34 | -0.91 | -44.6% | 19.8% | 0.10 |
 | Final Research Ensemble | 0.36 | -0.29 | -31.9% | 18.7% | 0.06 |
 
-The main takeaway is straightforward. On the included dataset, the final
-ensemble helps drawdown relative to buy-and-hold, but it does not produce a
-positive holdout Sharpe. I left that in the repo because I would rather show
-the actual outcome than smooth it over.
+The main takeaway is simple. On the included dataset, the final ensemble cuts
+drawdown relative to buy-and-hold, but it does not deliver a positive holdout
+Sharpe. I left that in because I would rather show the real outcome than clean
+it up for presentation.
 
-I also added a moving-block bootstrap summary for the holdout period. That file
-does not rescue the result; it makes the uncertainty explicit. The selected
-ensemble has only about a 30% bootstrap probability of positive holdout Sharpe
-on the included dataset, which is exactly the sort of check I would want to see
-if I were reviewing someone else's timing project.
+I also added a moving-block bootstrap summary for the holdout period. It does
+not make the result look better. It just shows the uncertainty more honestly.
+On the included dataset, the selected ensemble has only about a 30% bootstrap
+probability of positive holdout Sharpe.
 
 Useful result files:
 
@@ -179,9 +177,9 @@ pytest
 
 The defaults point to the included dataset, so the commands work as written.
 
-The main thing I would want someone to take from the repo is that the process
-is explicit. The rules are simple, the exposure is applied one day later, the
-ensemble is chosen on validation rather than holdout, and the weaker included
-holdout result is still shown plainly.
+What I want someone to take from the repo is that the process is easy to follow.
+The rules are simple, the exposure is applied one day later, the ensemble is
+chosen on validation rather than holdout, and the weaker included holdout
+result is still shown plainly.
 
 This is a research project, not a production trading system.
